@@ -16,20 +16,42 @@ Space owners list their inventory. Advertisers browse, filter, and send booking 
 | Auth | Supabase Auth (email/password + Google OAuth) |
 | Storage | Supabase Storage (signed URL uploads) |
 | Realtime | Supabase Realtime (live message threads) |
+| Map | react-leaflet v4 + OpenStreetMap |
 | Email | Resend |
 | Deployment | Vercel |
 
 ---
 
-## Features
+## What's Built
 
-- **Space listings** — create, edit, publish, and manage ad space listings with multi-image upload
-- **Browse & search** — full-text search, type filter, city filter, all synced to URL params
-- **Inquiry system** — advertisers send structured booking inquiries to space owners
-- **Live messaging** — real-time message threads between owner and advertiser via Supabase Realtime
-- **Notifications** — in-app notification bell + transactional email on key events
-- **Dual roles** — users can be both space owners and advertisers simultaneously
-- **Dashboard** — unified inbox, listing management, and profile editing
+### Browse page — `/spaces`
+- Split layout: scrollable card list on the left, interactive Leaflet map on the right
+- Map markers are clickable — popup shows name, type, price, and a "View listing" link
+- Filters via URL search params: full-text search (`q`), space type (`type`), city (`city`)
+- Server Component with `force-dynamic` so filters are always fresh
+- Map hidden on mobile — card list only
+
+### Space detail page — `/spaces/[id]`
+- Fetches single published space by ID
+- Shows title, type, city, price, description, and a "Send Inquiry" button placeholder
+- Returns 404 via `notFound()` if the space doesn't exist or isn't published
+
+### Data layer
+- `lib/supabase/client.ts` + `lib/supabase/server.ts` — Supabase clients for browser and server
+- `lib/queries/spaces.ts` — `getSpaces()` and `getSpaceById()`
+- `lib/utils/formatters.ts` — `formatPrice(cents)` integer cents → `$1,500`
+- `lib/types/database.types.ts` — `AdSpace` and `AdSpaceMapMarker` TypeScript interfaces
+
+---
+
+## Planned Features
+
+- **Auth** — email/password + Google OAuth, session middleware
+- **Onboarding** — post-signup role selection (owner, advertiser, or both)
+- **Listings CRUD** — 5-step SpaceForm, multi-image upload via Supabase Storage
+- **Inquiry system** — structured booking inquiries + real-time message threads
+- **Notifications** — in-app notification bell + transactional email via Resend
+- **Dashboard** — unified inbox, listing management, profile editing, stats
 
 ---
 
@@ -39,13 +61,13 @@ Space owners list their inventory. Advertisers browse, filter, and send booking 
 
 - Node.js 18+
 - A [Supabase](https://supabase.com) project
-- A [Resend](https://resend.com) account for transactional email
+- A [Resend](https://resend.com) account (for email — not required for map/browse)
 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/spotlight.git
-cd spotlight
+git clone https://github.com/owjfaller/SpotLight-Advertising.git
+cd SpotLight-Advertising
 npm install
 ```
 
@@ -63,14 +85,56 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 ### 3. Supabase setup
 
-Run the SQL migrations in your Supabase project (found in `/supabase/migrations/`):
+Run the following SQL in your Supabase project's SQL editor:
 
-- Creates all tables: `profiles`, `ad_spaces`, `space_images`, `inquiries`, `messages`, `notifications`
-- Sets up Row Level Security policies
-- Adds triggers for `handle_new_user` and `set_updated_at`
-- Creates the full-text search vector column on `ad_spaces`
+```sql
+-- ad_spaces table
+create table ad_spaces (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid references auth.users not null,
+  title text not null,
+  description text,
+  space_type text not null,
+  status text not null default 'draft' check (status in ('draft', 'published', 'archived')),
+  price_cents int not null,
+  city text not null,
+  address text,
+  lat float8,
+  lng float8,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  fts tsvector generated always as (
+    to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(city, ''))
+  ) stored
+);
 
-Create a storage bucket named `space-images` with public read access.
+-- Full-text search index
+create index ad_spaces_fts_idx on ad_spaces using gin(fts);
+
+-- Updated-at trigger
+create or replace function set_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger set_updated_at
+  before update on ad_spaces
+  for each row execute function set_updated_at();
+
+-- RLS
+alter table ad_spaces enable row level security;
+
+create policy "Published spaces are publicly readable"
+  on ad_spaces for select
+  using (status = 'published');
+
+create policy "Owners can manage their own spaces"
+  on ad_spaces for all
+  using (auth.uid() = owner_id);
+```
 
 ### 4. Run locally
 
@@ -78,7 +142,7 @@ Create a storage bucket named `space-images` with public read access.
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000/spaces](http://localhost:3000/spaces).
 
 ---
 
@@ -86,42 +150,26 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```
 app/
-  page.tsx                  # Landing page
-  layout.tsx                # Root layout (Navbar, Toaster)
-  (auth)/
-    login/page.tsx
-    signup/page.tsx
-    callback/route.ts       # OAuth callback
-  onboarding/page.tsx       # Post-signup role selection
   spaces/
-    page.tsx                # Browse & search
-    [id]/page.tsx           # Space detail
-    new/page.tsx            # Create listing
-  dashboard/
-    layout.tsx              # Auth guard + sidebar
-    page.tsx                # Stats overview
-    listings/               # Owner listing management
-    inquiries/              # Unified inbox + message threads
-    profile/page.tsx
-  api/
-    upload/route.ts
-    inquiries/route.ts
-    inquiries/[id]/route.ts
-    messages/route.ts
-    notifications/route.ts
+    page.tsx                  # Browse page — split card list + map
+    [id]/page.tsx             # Space detail page
 
 components/
-  layout/                   # Navbar, DashboardSidebar, Footer
-  spaces/                   # SpaceCard, SpaceForm, ImageUploader, etc.
-  inquiries/                # InquiryForm, MessageThread, etc.
-  shared/                   # Avatar, EmptyState, LoadingSpinner, etc.
+  spaces/
+    SpaceCard.tsx             # Listing card
+    SpaceMap.tsx              # Leaflet map (client)
+    SpaceMapWrapper.tsx       # dynamic() SSR wrapper
 
 lib/
-  supabase/                 # Browser + server clients, middleware helper
-  queries/                  # Data access functions
-  validations/              # Zod schemas
-  utils/                    # Formatters, storage helpers, notification helpers
-  types/                    # Supabase-generated database types
+  supabase/
+    client.ts                 # Browser Supabase client
+    server.ts                 # Server Supabase client
+  queries/
+    spaces.ts                 # getSpaces(), getSpaceById()
+  utils/
+    formatters.ts             # formatPrice()
+  types/
+    database.types.ts         # TypeScript interfaces
 ```
 
 ---
@@ -130,6 +178,8 @@ lib/
 
 | Decision | Choice | Rationale |
 |---|---|---|
+| Map library | react-leaflet v4 + OpenStreetMap | Free, no API key, works with React 18 |
+| Map SSR | `dynamic(..., { ssr: false })` | Leaflet uses `window` — can't run on server |
 | Roles | Boolean flags on `profiles` | Supports dual roles, no join complexity |
 | Image upload | Client → signed URL → Storage | No server memory/bandwidth overhead |
 | Search | Postgres FTS generated column | No external service at MVP scale |
