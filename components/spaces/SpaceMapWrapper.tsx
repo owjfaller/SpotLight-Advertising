@@ -14,8 +14,13 @@ const SpaceMap = dynamic(() => import('./SpaceMap'), {
 
 interface SpaceMapWrapperProps {
   markers: AdSpaceMapMarker[]
+  hoveredId: string | null
+  onMarkerHover: (id: string | null) => void
+  userLocation: [number, number] | null
+  radiusMiles: number
+  searchCity?: string
 }
 
-export default function SpaceMapWrapper({ markers }: SpaceMapWrapperProps) {
-  return <SpaceMap markers={markers} />
+export default function SpaceMapWrapper(props: SpaceMapWrapperProps) {
+  return <SpaceMap {...props} />
 }
