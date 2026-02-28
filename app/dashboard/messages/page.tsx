@@ -2,11 +2,11 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { api } from '@/lib/services/api'
-import { Conversation, Message, Profile } from '@/lib/types/database.types'
+import { Conversation, Message } from '@/lib/types/database.types'
 import { createClient } from '@/lib/supabase/client'
 
 export default function MessagesPage() {
-  const [conversations, setConversations] = useState<any[]>([])
+  const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +39,7 @@ export default function MessagesPage() {
 
     async function fetchMessages() {
       try {
-        const data = await api.getMessages(selectedId)
+        const data = await api.getMessages(selectedId!)
         setMessages(data)
       } catch (err) {
         console.error('Failed to fetch messages:', err)

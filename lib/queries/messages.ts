@@ -1,7 +1,7 @@
 import { createClient } from '../supabase/server'
 import { Conversation, Message } from '../types/database.types'
 
-export async function getConversations(userId: string): Promise<{ data: any[] | null; error: string | null }> {
+export async function getConversations(userId: string): Promise<{ data: Conversation[] | null; error: string | null }> {
   const supabase = createClient()
   
   // Fetch conversations where user is buyer or seller
