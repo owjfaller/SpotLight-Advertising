@@ -23,14 +23,6 @@ const typeColors: Record<string, string> = {
   Event:     '#2e0f2a',
 }
 
-const typeEmojis: Record<string, string> = {
-  Billboard: '🪧',
-  Vehicle:   '🚚',
-  Indoor:    '🏢',
-  Outdoor:   '🌳',
-  Digital:   '📺',
-  Event:     '🎪',
-}
 
 export default function SpaceCard({
   space,
@@ -74,16 +66,9 @@ export default function SpaceCard({
           </>
         ) : (
           <div
-            className="absolute inset-0 flex flex-col items-center justify-center gap-1"
-            style={{
-              background: `linear-gradient(135deg, ${color}cc, ${color}88)`,
-            }}
-          >
-            <span style={{ fontSize: '2rem', lineHeight: 1 }}>{typeEmojis[space.space_type] ?? '📍'}</span>
-            <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              {space.space_type}
-            </span>
-          </div>
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(135deg, ${color}dd, ${color}88)` }}
+          />
         )}
 
         {/* Price overlay bottom-left */}
