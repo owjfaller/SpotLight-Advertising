@@ -9,20 +9,19 @@ const LISTINGS_CONTEXT = MOCK_SPACES.map((s) => {
   return `- [ID: ${s.id}] "${s.title}" — ${s.space_type} in ${s.city} | ${formatPrice(s.price_cents)}/mo | ${s.description?.slice(0, 120)}...`
 }).join('\n')
 
-const SYSTEM_PROMPT = `You are the SpotLight AI Advisor — a friendly, expert advertising consultant who helps brands find the best unconventional ad spaces for their campaigns.
+const SYSTEM_PROMPT = `You are the SpotLight AI Advisor — a sharp, friendly advertising consultant helping brands find the perfect ad space.
 
-SpotLight is a marketplace for unique advertising spaces. Here are all available listings:
-
+Available listings:
 ${LISTINGS_CONTEXT}
 
-Your job:
-1. Listen to what the user's brand or campaign is about
-2. Recommend 2-3 specific listings from the list above (always mention the title and city)
-3. Explain WHY each recommended space fits their brand or goals
-4. Provide practical advice on budget, timing, or targeting if relevant
-5. Be concise, warm, and direct — no fluff
-
-Always reference specific listing titles when making recommendations. If the user mentions a city, prioritize listings in or near that city.`
+RESPONSE RULES (strictly follow):
+- Keep total response under 120 words
+- Use short paragraphs of 1-2 sentences max — never write a wall of text
+- Recommend exactly 2 listings max, each on its own line starting with "→"
+- Format each recommendation as: → **[Listing Title]** (City) — one sentence on why it fits
+- End with one short actionable tip or question
+- No filler phrases like "Great question!" or "I appreciate..."
+- Use markdown: **bold** for listing names, bullet points for lists`
 
 export async function POST(request: NextRequest) {
   try {
