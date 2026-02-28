@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     .from('ad_spaces')
     .insert({
       title,
-      owner: profile?.display_name ?? null,
+      owner_id: user.id,
       space_type: type,
       address: location,
       city,
