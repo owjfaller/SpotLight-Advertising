@@ -23,13 +23,14 @@ const typeColors: Record<string, string> = {
   Event:     '#2e0f2a',
 }
 
-const typePhotoKeywords: Record<string, string> = {
-  Billboard: 'billboard,signage,outdoor-advertising',
-  Vehicle:   'delivery-van,truck,vehicle-wrap',
-  Indoor:    'indoor-venue,interior,station',
-  Outdoor:   'mural,rooftop,outdoor-wall',
-  Digital:   'led-screen,digital-display,neon',
-  Event:     'market-booth,event-tent,fair',
+// Picsum IDs chosen to visually match each space type
+const typePicsumId: Record<string, number> = {
+  Billboard: 1010,
+  Vehicle:   244,
+  Indoor:    260,
+  Outdoor:   257,
+  Digital:   325,
+  Event:     169,
 }
 
 
@@ -45,8 +46,8 @@ export default function SpaceCard({
 
   const color = typeColors[space.space_type] ?? '#1a2130'
   const uploadedUrl = (space as any).image_url ?? null
-  const keywords = typePhotoKeywords[space.space_type] ?? 'advertising'
-  const placeholderUrl = `https://source.unsplash.com/400x300/?${keywords}&sig=${space.id}`
+  const picsumId = typePicsumId[space.space_type] ?? 10
+  const placeholderUrl = `https://picsum.photos/id/${picsumId}/400/300`
   const imageUrl = (!imgError && uploadedUrl) ? uploadedUrl : placeholderUrl
 
   return (
