@@ -1,9 +1,14 @@
+'use client'
+
 import Link from 'next/link'
 import { AdSpace } from '@/lib/types/database.types'
 import { formatPrice } from '@/lib/utils/formatters'
 
 interface SpaceCardProps {
   space: AdSpace
+  isHighlighted?: boolean
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
 }
 
 // Deterministic placeholder color per space type
@@ -25,15 +30,22 @@ const typeEmojis: Record<string, string> = {
   Event: '🎪',
 }
 
-export default function SpaceCard({ space }: SpaceCardProps) {
+export default function SpaceCard({ space, isHighlighted, onMouseEnter, onMouseLeave }: SpaceCardProps) {
   const color = typeColors[space.space_type] ?? 'bg-gray-100'
   const emoji = typeEmojis[space.space_type] ?? '📍'
 
   return (
-    <Link href={`/spaces/${space.id}`} className="group block">
+    <Link
+      href={`/spaces/${space.id}`}
+      className="group block"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       {/* Square image area */}
       <div
-        className={`relative aspect-square w-full rounded-lg ${color} flex items-center justify-center overflow-hidden`}
+        className={`relative aspect-square w-full rounded-lg ${color} flex items-center justify-center overflow-hidden transition-shadow ${
+          isHighlighted ? 'ring-2 ring-blue-600 ring-offset-1' : ''
+        }`}
       >
         <span className="text-5xl">{emoji}</span>
         {/* Type badge */}

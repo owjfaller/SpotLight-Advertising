@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { useEffect, useRef } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet'
 import Link from 'next/link'
 import L from 'leaflet'
 import { AdSpaceMapMarker } from '@/lib/types/database.types'
@@ -17,20 +17,65 @@ function fixLeafletIcons() {
   })
 }
 
+function createMarkerIcon(isHovered: boolean): L.DivIcon {
+  const size = isHovered ? 24 : 16
+  const bg = isHovered ? '#1d4ed8' : '#3b82f6'
+  const border = isHovered ? '3px solid #1e3a8a' : '2px solid #fff'
+  const shadow = isHovered
+    ? '0 2px 8px rgba(0,0,0,0.4)'
+    : '0 1px 3px rgba(0,0,0,0.3)'
+
+  return L.divIcon({
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:${border};box-shadow:${shadow};"></div>`,
+    className: '',
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  })
+}
+
+function MapController({ userLocation }: { userLocation: [number, number] | null }) {
+  const map = useMap()
+  const prevRef = useRef<[number, number] | null>(null)
+
+  useEffect(() => {
+    if (
+      userLocation &&
+      (prevRef.current === null ||
+        prevRef.current[0] !== userLocation[0] ||
+        prevRef.current[1] !== userLocation[1])
+    ) {
+      map.flyTo(userLocation, 12)
+      prevRef.current = userLocation
+    }
+  }, [map, userLocation])
+
+  return null
+}
+
 interface SpaceMapProps {
   markers: AdSpaceMapMarker[]
+  hoveredId: string | null
+  onMarkerHover: (id: string | null) => void
+  userLocation: [number, number] | null
+  radiusMiles: number
 }
 
 const DEFAULT_CENTER: [number, number] = [39.8283, -98.5795] // continental US center
 const DEFAULT_ZOOM = 4
 
-export default function SpaceMap({ markers }: SpaceMapProps) {
+export default function SpaceMap({
+  markers,
+  hoveredId,
+  onMarkerHover,
+  userLocation,
+  radiusMiles,
+}: SpaceMapProps) {
   useEffect(() => {
     fixLeafletIcons()
   }, [])
 
   const center: [number, number] =
-    markers.length > 0 ? [markers[0].lat, markers[0].lng] : DEFAULT_CENTER
+    userLocation ?? (markers.length > 0 ? [markers[0].lat, markers[0].lng] : DEFAULT_CENTER)
   const zoom = markers.length > 0 ? 10 : DEFAULT_ZOOM
 
   return (
@@ -39,13 +84,36 @@ export default function SpaceMap({ markers }: SpaceMapProps) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
+      <MapController userLocation={userLocation} />
+
+      {userLocation && (
+        <Circle
+          center={userLocation}
+          radius={radiusMiles * 1609.34}
+          pathOptions={{ color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.08 }}
+        />
+      )}
+
       {markers.map((marker) => (
-        <Marker key={marker.id} position={[marker.lat, marker.lng]}>
+        <Marker
+          key={marker.id}
+          position={[marker.lat, marker.lng]}
+          icon={createMarkerIcon(hoveredId === marker.id)}
+          eventHandlers={{
+            mouseover: () => onMarkerHover(marker.id),
+            mouseout: () => onMarkerHover(null),
+          }}
+        >
           <Popup>
             <div className="min-w-[160px]">
               <p className="font-semibold text-gray-900">{marker.title}</p>
-              <p className="mt-0.5 text-xs text-gray-500">{marker.space_type} · {marker.city}</p>
-              <p className="mt-1 font-bold text-indigo-600">{formatPrice(marker.price_cents)}/mo</p>
+              <p className="mt-0.5 text-xs text-gray-500">
+                {marker.space_type} · {marker.city}
+              </p>
+              <p className="mt-1 font-bold text-indigo-600">
+                {formatPrice(marker.price_cents)}/mo
+              </p>
               <Link
                 href={`/spaces/${marker.id}`}
                 className="mt-2 block text-center rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700"
