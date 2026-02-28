@@ -274,7 +274,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-[calc(100vh-56px)] overflow-hidden bg-white">
+    <div className="flex w-full h-[calc(100vh-56px)] overflow-hidden bg-white">
 
       {/* ── Desktop sidebar ── */}
       <aside className="hidden md:flex w-64 shrink-0 flex-col bg-white overflow-hidden">
@@ -481,7 +481,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
       </div>
 
       {/* ── Map column ── */}
-      <div className={`flex-1 ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 bg-white ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
         <SpaceMapWrapper
           markers={filteredMarkers}
           hoveredId={hoveredId}
