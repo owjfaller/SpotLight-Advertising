@@ -16,106 +16,91 @@ const STARTER_PROMPTS = [
   'Vehicle wraps vs billboards for B2C?',
 ]
 
-// ── Detect listing mentions in assistant text ────────────────────────────────
-function extractMentionedListings(text: string) {
-  return MOCK_SPACES.filter((space) =>
-    text.toLowerCase().includes(space.title.toLowerCase())
-  )
+const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
+  Billboard: { bg: '#dbeafe', text: '#1d4ed8' },
+  Vehicle:   { bg: '#fef3c7', text: '#b45309' },
+  Indoor:    { bg: '#dcfce7', text: '#15803d' },
+  Outdoor:   { bg: '#e0f2fe', text: '#0369a1' },
+  Digital:   { bg: '#f3e8ff', text: '#7e22ce' },
+  Event:     { bg: '#fce7f3', text: '#be185d' },
 }
 
-// ── Simple markdown renderer ─────────────────────────────────────────────────
-function renderMarkdown(text: string) {
-  const lines = text.split('\n')
-  const elements: React.ReactNode[] = []
-  let key = 0
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-
-    if (!line.trim()) {
-      elements.push(<div key={key++} className="h-2" />)
-      continue
-    }
-
-    // Numbered list item
-    const numberedMatch = line.match(/^(\d+)\.\s+(.+)/)
-    if (numberedMatch) {
-      elements.push(
-        <div key={key++} className="flex gap-1.5 mb-1">
-          <span className="shrink-0 font-semibold text-[#c47f10]">{numberedMatch[1]}.</span>
-          <span>{inlineMarkdown(numberedMatch[2])}</span>
-        </div>
-      )
-      continue
-    }
-
-    // Bullet / recommendation line starting with → or -
-    const bulletMatch = line.match(/^(→|-|\*)\s+(.+)/)
-    if (bulletMatch) {
-      const isRecommendation = bulletMatch[1] === '→'
-      elements.push(
-        <div key={key++} className={`flex gap-1.5 mb-1 ${isRecommendation ? 'mt-1' : ''}`}>
-          <span className="shrink-0 text-[#e8a838]">{isRecommendation ? '→' : '•'}</span>
-          <span>{inlineMarkdown(bulletMatch[2])}</span>
-        </div>
-      )
-      continue
-    }
-
-    // Normal paragraph
-    elements.push(
-      <p key={key++} className="mb-1 leading-snug">
-        {inlineMarkdown(line)}
-      </p>
-    )
+// ── Parse assistant response into display text + picked listing IDs ──────────
+function parseResponse(content: string): { text: string; pickedIds: string[] } {
+  const picksMatch = content.split(/PICKS:/i)
+  if (picksMatch.length < 2) {
+    return { text: content.trim(), pickedIds: [] }
   }
 
-  return elements
+  const textPart = picksMatch[0].trim()
+  const picksPart = picksMatch[1]
+
+  // Each line in picks section is a listing title
+  const pickedIds = picksPart
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((title) => {
+      const match = MOCK_SPACES.find(
+        (s) => s.title.toLowerCase() === title.toLowerCase()
+      )
+      return match?.id ?? null
+    })
+    .filter((id): id is string => id !== null)
+
+  return { text: textPart, pickedIds }
 }
 
-function inlineMarkdown(text: string): React.ReactNode {
-  // Handle **bold**
-  const parts = text.split(/(\*\*[^*]+\*\*)/)
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>
-    }
-    return part
-  })
-}
-
-// ── Listing card component ───────────────────────────────────────────────────
+// ── Listing card ─────────────────────────────────────────────────────────────
 function ListingCard({ spaceId }: { spaceId: string }) {
   const space = MOCK_SPACES.find((s) => s.id === spaceId)
   if (!space) return null
 
-  const typeColors: Record<string, string> = {
-    Billboard: '#dbeafe',
-    Vehicle: '#fef3c7',
-    Indoor: '#dcfce7',
-    Outdoor: '#e0f2fe',
-    Digital: '#f3e8ff',
-    Event: '#fce7f3',
-  }
-  const bg = typeColors[space.space_type] ?? '#f3f4f6'
+  const color = TYPE_COLORS[space.space_type] ?? { bg: '#f3f4f6', text: '#374151' }
+  const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/120/80`
 
   return (
     <Link
       href={`/spaces/${space.id}`}
-      className="mt-2 flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+      className="group flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:border-[#e8a838] hover:shadow-md"
     >
-      <div
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold"
-        style={{ background: bg, color: '#374151' }}
-      >
-        {space.space_type.slice(0, 2).toUpperCase()}
-      </div>
+      {/* Thumbnail */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imageUrl}
+        alt={space.title}
+        className="h-14 w-14 shrink-0 rounded-xl object-cover"
+      />
+      {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-semibold text-gray-900">{space.title}</p>
-        <p className="text-xs text-gray-400">{space.city} · {formatPrice(space.price_cents)}/mo</p>
+        <p className="truncate text-xs font-semibold text-gray-900 group-hover:text-[#c47f10]">
+          {space.title}
+        </p>
+        <p className="mt-0.5 text-xs text-gray-400">{space.city}</p>
+        <div className="mt-1 flex items-center gap-1.5">
+          <span
+            className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+            style={{ background: color.bg, color: color.text }}
+          >
+            {space.space_type}
+          </span>
+          <span className="text-xs font-semibold text-[#e8a838]">
+            {formatPrice(space.price_cents)}/mo
+          </span>
+        </div>
       </div>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#e8a838" className="h-4 w-4 shrink-0">
-        <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
+      {/* Arrow */}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        className="h-4 w-4 shrink-0 text-gray-300 transition-colors group-hover:text-[#e8a838]"
+      >
+        <path
+          fillRule="evenodd"
+          d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
+          clipRule="evenodd"
+        />
       </svg>
     </Link>
   )
@@ -228,7 +213,7 @@ export default function AIChatWidget() {
       {open && (
         <div
           className="flex w-80 flex-col overflow-hidden rounded-2xl shadow-2xl"
-          style={{ height: 500, background: '#fff', border: '1px solid #e5e7eb' }}
+          style={{ height: 520, background: '#fff', border: '1px solid #e5e7eb' }}
         >
           {/* Header */}
           <div className="flex shrink-0 items-center justify-between px-4 py-3" style={{ background: '#0d1117' }}>
@@ -242,17 +227,17 @@ export default function AIChatWidget() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ background: '#faf7f2' }}>
+          <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ background: '#faf7f2' }}>
             {showStarters ? (
-              <div className="flex flex-col gap-3">
-                <p className="text-xs text-gray-500 text-center">
+              <div className="flex flex-col gap-2.5">
+                <p className="text-xs text-gray-500 text-center pt-1">
                   Tell me about your brand and I&apos;ll find the best ad spaces for you.
                 </p>
                 {STARTER_PROMPTS.map((prompt) => (
                   <button
                     key={prompt}
                     onClick={() => sendMessage(prompt)}
-                    className="rounded-xl border border-[#e8a838]/40 bg-white px-3 py-2 text-left text-xs text-gray-700 transition-colors hover:border-[#e8a838] hover:bg-[#e8a838]/5"
+                    className="rounded-xl border border-[#e8a838]/40 bg-white px-3 py-2.5 text-left text-xs text-gray-700 transition-colors hover:border-[#e8a838] hover:bg-[#e8a838]/5"
                   >
                     {prompt}
                   </button>
@@ -260,37 +245,43 @@ export default function AIChatWidget() {
               </div>
             ) : (
               messages.map((msg, i) => {
-                const mentionedListings = msg.role === 'assistant' && msg.content
-                  ? extractMentionedListings(msg.content)
-                  : []
+                if (msg.role === 'user') {
+                  return (
+                    <div key={i} className="flex justify-end">
+                      <div className="max-w-[85%] rounded-2xl bg-[#e8a838] px-3 py-2 text-xs text-white">
+                        {msg.content}
+                      </div>
+                    </div>
+                  )
+                }
+
+                // Assistant message
+                const isStreaming = streaming && i === messages.length - 1
+                const { text, pickedIds } = parseResponse(msg.content)
 
                 return (
-                  <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                    <div
-                      className={`max-w-[90%] rounded-2xl px-3 py-2.5 text-xs ${
-                        msg.role === 'user'
-                          ? 'bg-[#e8a838] text-white'
-                          : 'bg-white text-gray-700 shadow-sm'
-                      }`}
-                    >
-                      {msg.role === 'user' ? (
-                        msg.content
-                      ) : msg.content ? (
-                        renderMarkdown(msg.content)
-                      ) : (
+                  <div key={i} className="flex flex-col gap-2">
+                    {/* Text bubble */}
+                    <div className="rounded-2xl bg-white px-3 py-2.5 text-xs leading-relaxed text-gray-700 shadow-sm">
+                      {msg.content === '' ? (
                         <span className="inline-flex gap-1">
                           <span className="animate-bounce" style={{ animationDelay: '0ms' }}>•</span>
                           <span className="animate-bounce" style={{ animationDelay: '150ms' }}>•</span>
                           <span className="animate-bounce" style={{ animationDelay: '300ms' }}>•</span>
                         </span>
+                      ) : (
+                        text || msg.content
                       )}
                     </div>
 
-                    {/* Listing cards — only show when streaming is done */}
-                    {msg.role === 'assistant' && !streaming && mentionedListings.length > 0 && (
-                      <div className="mt-1 w-full space-y-1">
-                        {mentionedListings.map((space) => (
-                          <ListingCard key={space.id} spaceId={space.id} />
+                    {/* Listing cards — shown once streaming is done */}
+                    {!isStreaming && pickedIds.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="px-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                          Recommended spaces
+                        </p>
+                        {pickedIds.map((id) => (
+                          <ListingCard key={id} spaceId={id} />
                         ))}
                       </div>
                     )}

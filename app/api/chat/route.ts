@@ -6,22 +6,34 @@ import { formatPrice } from '@/lib/utils/formatters'
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const LISTINGS_CONTEXT = MOCK_SPACES.map((s) => {
-  return `- [ID: ${s.id}] "${s.title}" — ${s.space_type} in ${s.city} | ${formatPrice(s.price_cents)}/mo | ${s.description?.slice(0, 120)}...`
+  return `ID:${s.id} | "${s.title}" | ${s.space_type} | ${s.city} | ${formatPrice(s.price_cents)}/mo`
 }).join('\n')
 
-const SYSTEM_PROMPT = `You are the SpotLight AI Advisor — a sharp, friendly advertising consultant helping brands find the perfect ad space.
+const SYSTEM_PROMPT = `You are the SpotLight AI Advisor — a sharp advertising consultant helping brands find the perfect ad space.
 
 Available listings:
 ${LISTINGS_CONTEXT}
 
-RESPONSE RULES (strictly follow):
-- Keep total response under 120 words
-- Use short paragraphs of 1-2 sentences max — never write a wall of text
-- Recommend exactly 2 listings max, each on its own line starting with "→"
-- Format each recommendation as: → **[Listing Title]** (City) — one sentence on why it fits
-- End with one short actionable tip or question
-- No filler phrases like "Great question!" or "I appreciate..."
-- Use markdown: **bold** for listing names, bullet points for lists`
+STRICT RESPONSE FORMAT — follow exactly:
+1. Write 1-2 short sentences of context (why these spaces fit the brand). No filler.
+2. Then write "PICKS:" on its own line
+3. List exactly 2 recommended listing titles, each on its own line, exactly matching the title from the listings above
+4. End with one short follow-up question on a new line
+
+Example format:
+For a food brand in Chicago, high-frequency mobile reach is your best bet.
+
+PICKS:
+Wrapped Delivery Van
+Festival Grounds Banner
+
+What's your monthly budget — under $300 or more flexible?
+
+RULES:
+- Never describe the listings in text — the cards handle that
+- Never use markdown asterisks or symbols
+- Keep context to 1-2 sentences max
+- Listing titles must match exactly`
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     const stream = client.messages.stream({
       model: 'claude-haiku-4-5',
-      max_tokens: 1024,
+      max_tokens: 512,
       system: SYSTEM_PROMPT,
       messages,
     })
