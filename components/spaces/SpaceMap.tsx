@@ -21,10 +21,7 @@ function createMarkerIcon(isHovered: boolean): L.DivIcon {
   const size   = isHovered ? 24 : 16
   const bg     = isHovered ? '#1d4ed8' : '#3b82f6'
   const border = isHovered ? '3px solid #1e3a8a' : '2px solid #fff'
-  const shadow = isHovered
-    ? '0 2px 8px rgba(0,0,0,0.4)'
-    : '0 1px 3px rgba(0,0,0,0.3)'
-
+  const shadow = isHovered ? '0 2px 8px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.3)'
   return L.divIcon({
     html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};border:${border};box-shadow:${shadow};transition:all 0.15s ease;"></div>`,
     className: '',
@@ -33,63 +30,85 @@ function createMarkerIcon(isHovered: boolean): L.DivIcon {
   })
 }
 
-// Handles programmatic map movement: flies to user location or fits marker bounds
-// when the filtered marker set changes (e.g. after city/type filter navigation).
+// Controls map movement: flies to user location, fits marker bounds, or
+// geocodes the searched city when it has no matching listings.
 function MapController({
   userLocation,
   markers,
+  searchCity,
 }: {
   userLocation: [number, number] | null
   markers: AdSpaceMapMarker[]
+  searchCity?: string
 }) {
-  const map               = useRef<ReturnType<typeof useMap> | null>(null)
-  const mapInstance       = useMap()
-  const prevUserLocation  = useRef<[number, number] | null>(null)
-  const isFirstRender     = useRef(true)
-  const prevMarkerKey     = useRef('')
+  const mapRef           = useRef<ReturnType<typeof useMap> | null>(null)
+  mapRef.current         = useMap()
+  const prevUserLocation = useRef<[number, number] | null>(null)
+  const isFirstRender    = useRef(true)
+  const prevMarkerKey    = useRef('')
+  const prevSearchCity   = useRef<string | undefined>(undefined)
 
-  // keep ref current
-  map.current = mapInstance
-
+  // ── Fly to user location when it changes ──────────────────────────────────
   useEffect(() => {
-    const m = map.current!
-
-    // ── Fly to user location when it's first set or updated ─────────────────
+    if (!userLocation) return
     if (
-      userLocation &&
-      (prevUserLocation.current === null ||
-        prevUserLocation.current[0] !== userLocation[0] ||
-        prevUserLocation.current[1] !== userLocation[1])
-    ) {
-      prevUserLocation.current = userLocation
-      m.flyTo(userLocation, 12, { animate: true, duration: 1.2 })
-      return
-    }
+      prevUserLocation.current !== null &&
+      prevUserLocation.current[0] === userLocation[0] &&
+      prevUserLocation.current[1] === userLocation[1]
+    ) return
+    prevUserLocation.current = userLocation
+    mapRef.current!.flyTo(userLocation, 12, { animate: true, duration: 1.2 })
+  }, [userLocation])
 
-    // ── On initial mount the MapContainer already used the correct center ────
+  // ── Fly to marker bounds or geocode city when filter changes ──────────────
+  useEffect(() => {
+    const m = mapRef.current!
+
     if (isFirstRender.current) {
-      isFirstRender.current = false
-      prevMarkerKey.current = markers.map((mk) => mk.id).sort().join(',')
+      isFirstRender.current  = false
+      prevMarkerKey.current  = markers.map((mk) => mk.id).sort().join(',')
+      prevSearchCity.current = searchCity
       return
     }
 
-    // ── Fly to new markers when city/type filter changes (no proximity) ──────
-    if (!userLocation) {
-      const key = markers.map((mk) => mk.id).sort().join(',')
-      if (key !== prevMarkerKey.current) {
-        prevMarkerKey.current = key
-        if (markers.length === 0) return
-        if (markers.length === 1) {
-          m.flyTo([markers[0].lat, markers[0].lng], 12, { animate: true, duration: 1.2 })
-        } else {
-          const bounds = L.latLngBounds(
-            markers.map((mk) => [mk.lat, mk.lng] as [number, number]),
-          )
-          m.flyToBounds(bounds, { padding: [50, 50], maxZoom: 12, animate: true, duration: 1.2 })
-        }
+    if (userLocation) return // proximity filter takes priority
+
+    const markerKey      = markers.map((mk) => mk.id).sort().join(',')
+    const markersChanged = markerKey !== prevMarkerKey.current
+    const cityChanged    = searchCity !== prevSearchCity.current
+
+    if (!markersChanged && !cityChanged) return
+    prevMarkerKey.current  = markerKey
+    prevSearchCity.current = searchCity
+
+    if (markers.length > 0) {
+      // Fit all matching markers in view
+      if (markers.length === 1) {
+        m.flyTo([markers[0].lat, markers[0].lng], 12, { animate: true, duration: 1.2 })
+      } else {
+        const bounds = L.latLngBounds(
+          markers.map((mk) => [mk.lat, mk.lng] as [number, number]),
+        )
+        m.flyToBounds(bounds, { padding: [50, 50], maxZoom: 12, animate: true, duration: 1.2 })
       }
+    } else if (searchCity && cityChanged) {
+      // No matching listings — geocode the city name and still fly there
+      fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchCity)}&format=json&limit=1`,
+      )
+        .then((r) => r.json())
+        .then((results: Array<{ lat: string; lon: string }>) => {
+          if (results[0]) {
+            m.flyTo(
+              [parseFloat(results[0].lat), parseFloat(results[0].lon)],
+              12,
+              { animate: true, duration: 1.2 },
+            )
+          }
+        })
+        .catch(() => {}) // fail silently
     }
-  }, [userLocation, markers])
+  }, [userLocation, markers, searchCity])
 
   return null
 }
@@ -100,6 +119,7 @@ interface SpaceMapProps {
   onMarkerHover: (id: string | null) => void
   userLocation: [number, number] | null
   radiusMiles: number
+  searchCity?: string
 }
 
 const DEFAULT_CENTER: [number, number] = [39.8283, -98.5795]
@@ -111,10 +131,9 @@ export default function SpaceMap({
   onMarkerHover,
   userLocation,
   radiusMiles,
+  searchCity,
 }: SpaceMapProps) {
-  useEffect(() => {
-    fixLeafletIcons()
-  }, [])
+  useEffect(() => { fixLeafletIcons() }, [])
 
   const center: [number, number] =
     userLocation ??
@@ -125,7 +144,6 @@ export default function SpaceMap({
     <MapContainer
       center={center}
       zoom={zoom}
-      // Smoother zoom: fractional snap + require more pixels per zoom step
       zoomSnap={0.5}
       zoomDelta={0.5}
       wheelPxPerZoomLevel={100}
@@ -136,7 +154,11 @@ export default function SpaceMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <MapController userLocation={userLocation} markers={markers} />
+      <MapController
+        userLocation={userLocation}
+        markers={markers}
+        searchCity={searchCity}
+      />
 
       {userLocation && (
         <Circle
@@ -167,7 +189,7 @@ export default function SpaceMap({
               </p>
               <Link
                 href={`/spaces/${marker.id}`}
-                className="mt-2 block text-center rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700"
+                className="mt-2 block rounded bg-indigo-600 px-3 py-1 text-center text-xs font-medium text-white hover:bg-indigo-700"
               >
                 View listing
               </Link>

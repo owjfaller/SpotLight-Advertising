@@ -18,22 +18,9 @@ interface SpaceMapWrapperProps {
   onMarkerHover: (id: string | null) => void
   userLocation: [number, number] | null
   radiusMiles: number
+  searchCity?: string
 }
 
-export default function SpaceMapWrapper({
-  markers,
-  hoveredId,
-  onMarkerHover,
-  userLocation,
-  radiusMiles,
-}: SpaceMapWrapperProps) {
-  return (
-    <SpaceMap
-      markers={markers}
-      hoveredId={hoveredId}
-      onMarkerHover={onMarkerHover}
-      userLocation={userLocation}
-      radiusMiles={radiusMiles}
-    />
-  )
+export default function SpaceMapWrapper(props: SpaceMapWrapperProps) {
+  return <SpaceMap {...props} />
 }

@@ -431,6 +431,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
           onMarkerHover={handleMarkerHover}
           userLocation={userLocation}
           radiusMiles={radiusMiles}
+          searchCity={searchParams.city}
         />
       </div>
 
