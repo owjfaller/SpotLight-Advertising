@@ -41,7 +41,11 @@ export default function SignupPage() {
     })
 
     if (signUpError) {
-      setError(signUpError.message)
+      if (signUpError.message.toLowerCase().includes('already registered') || signUpError.message.toLowerCase().includes('already been registered')) {
+        setError('already_registered')
+      } else {
+        setError(signUpError.message)
+      }
       setLoading(false)
       return
     }
@@ -190,7 +194,12 @@ export default function SignupPage() {
 
             {error && (
               <p className="rounded-lg px-3 py-2 text-sm" style={{ background: 'rgba(255,80,80,0.1)', color: '#ff6b6b' }}>
-                {error}
+                {error === 'already_registered' ? (
+                  <>This email is already registered.{' '}
+                    <Link href="/login" className="font-semibold underline">Log in instead</Link>
+                    {' '}or reset your password.
+                  </>
+                ) : error}
               </p>
             )}
 
