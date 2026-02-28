@@ -122,10 +122,17 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
         setUserLng(pos.coords.longitude)
         setGeoLoading(false)
       },
-      () => {
-        setGeoError('Location access was denied.')
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError("Location blocked. Enable it in your browser\u2019s site settings, then try again.")
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setGeoError('Your location could not be determined. Try again.')
+        } else {
+          setGeoError('Location request timed out. Try again.')
+        }
         setGeoLoading(false)
       },
+      { timeout: 10000, maximumAge: 60000 },
     )
   }
 
