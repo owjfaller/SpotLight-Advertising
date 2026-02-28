@@ -9,7 +9,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<{
     profile: Profile | null
     published: AdSpace[]
-    interestedIn: any[]
+    interestedIn: Record<string, unknown>[]
   } | null>(null)
   const [loading, setLoading] = useState(true)
 

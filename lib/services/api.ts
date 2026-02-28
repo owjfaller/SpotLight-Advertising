@@ -4,6 +4,7 @@ export interface AdSpaceFilters {
   low_price?: number
   high_price?: number
   type?: SpaceType
+  city?: string
   radius?: number
   lat?: number
   lng?: number
@@ -72,12 +73,12 @@ class ApiService {
   async getMyProfile(): Promise<{
     profile: Profile
     published: AdSpace[]
-    interestedIn: any[]
+    interestedIn: Record<string, unknown>[]
   }> {
     return this.request<{
       profile: Profile
       published: AdSpace[]
-      interestedIn: any[]
+      interestedIn: Record<string, unknown>[]
     }>('/api/profiles/me')
   }
 }

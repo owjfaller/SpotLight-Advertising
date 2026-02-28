@@ -18,8 +18,8 @@ export default function InterestedButton({ spaceId }: InterestedButtonProps) {
     try {
       await api.expressInterest(spaceId)
       setInterested(true)
-    } catch (err: any) {
-      setError(err.message || 'Failed to express interest')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to express interest')
     } finally {
       setLoading(false)
     }

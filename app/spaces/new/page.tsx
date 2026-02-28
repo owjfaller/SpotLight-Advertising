@@ -71,8 +71,8 @@ export default function NewListingPage() {
         image_url: imageUrl || undefined,
       })
       router.push(`/spaces/${data.id}`)
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.')
       setLoading(false)
     }
   }

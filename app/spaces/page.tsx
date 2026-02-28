@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { api, AdSpaceFilters } from '@/lib/services/api'
-import { AdSpace, AdSpaceMapMarker } from '@/lib/types/database.types'
+import { AdSpace, AdSpaceMapMarker, SpaceType } from '@/lib/types/database.types'
 import SpacesExplorer from '@/components/spaces/SpacesExplorer'
 
 interface SpacesPageProps {
@@ -23,7 +23,7 @@ export default function SpacesPage({ searchParams }: SpacesPageProps) {
       try {
         setLoading(true)
         const filters: AdSpaceFilters = {
-          type: searchParams.type as any,
+          type: searchParams.type as SpaceType | undefined,
           city: searchParams.city
         }
         const data = await api.getListings(filters)
