@@ -277,7 +277,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
     <div className="flex w-full h-[calc(100vh-56px)] overflow-hidden bg-white">
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden md:flex w-64 shrink-0 flex-col bg-white overflow-hidden">
+      <aside className="hidden md:flex w-64 shrink-0 flex-col bg-white border-r border-gray-200 overflow-hidden">
         <div className="flex-none p-4">
           <h1 className="text-xl font-bold text-gray-900">Marketplace</h1>
         </div>
@@ -370,7 +370,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
       {/* ── Card list column ── */}
       <div
-        className={`flex flex-col bg-white overflow-hidden w-full md:w-80 md:shrink-0 ${
+        className={`flex flex-col bg-white border-r border-gray-200 overflow-hidden w-full md:w-80 md:shrink-0 ${
           mobileView === 'map' ? 'hidden md:flex' : 'flex'
         }`}
       >
