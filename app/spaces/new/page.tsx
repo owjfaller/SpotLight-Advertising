@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -9,7 +9,6 @@ const SPACE_TYPES = ['Billboard', 'Vehicle', 'Indoor', 'Outdoor', 'Digital', 'Ev
 
 export default function NewListingPage() {
   const router = useRouter()
-  const [authChecked, setAuthChecked] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -26,15 +25,6 @@ export default function NewListingPage() {
     price:       '',
     description: '',
   })
-
-  // Auth guard
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) router.replace('/login')
-      else setAuthChecked(true)
-    })
-  }, [router])
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -87,8 +77,6 @@ export default function NewListingPage() {
 
     router.push(`/spaces/${data.id}`)
   }
-
-  if (!authChecked) return null
 
   const inputStyle = {
     background: 'var(--surface)',
