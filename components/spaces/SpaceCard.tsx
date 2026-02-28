@@ -23,15 +23,6 @@ const typeColors: Record<string, string> = {
   Event:     '#2e0f2a',
 }
 
-// Curated picsum IDs — each reliably shows a contextually relevant scene
-const typePicsumId: Record<string, number> = {
-  Billboard: 325,  // city street with large signage
-  Vehicle:   133,  // truck / transport
-  Indoor:    164,  // interior hall / atrium
-  Outdoor:   192,  // urban wall / street scene
-  Digital:    24,  // colourful lights / screens
-  Event:     167,  // outdoor crowd / market
-}
 
 
 export default function SpaceCard({
@@ -44,8 +35,8 @@ export default function SpaceCard({
 }: SpaceCardProps) {
   const color = typeColors[space.space_type] ?? '#1a2130'
   const uploadedUrl = (space as AdSpace & { image_url?: string }).image_url ?? null
-  const picsumId = typePicsumId[space.space_type] ?? 10
-  const picsumUrl = `https://picsum.photos/id/${picsumId}/400/300`
+  const seed = encodeURIComponent(space.title ?? space.id)
+  const picsumUrl = `https://picsum.photos/seed/${seed}/400/300`
 
   // src cycles: uploadedUrl → picsumUrl → null (solid colour fallback)
   const [src, setSrc] = useState<string | null>(uploadedUrl ?? picsumUrl)
