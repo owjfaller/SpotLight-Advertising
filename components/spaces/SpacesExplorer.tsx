@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import SpaceCard from '@/components/spaces/SpaceCard'
 import SpaceMapWrapper from '@/components/spaces/SpaceMapWrapper'
 import { AdSpace, AdSpaceMapMarker } from '@/lib/types/database.types'
 import { haversineDistance } from '@/lib/utils/haversine'
 
 const SPACE_TYPES = ['Billboard', 'Vehicle', 'Indoor', 'Outdoor', 'Digital', 'Event']
-const RADIUS_OPTIONS = [5, 10, 25, 50] as const
 
 interface SpacesExplorerProps {
   spaces: AdSpace[]
@@ -32,11 +31,35 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [userLat, setUserLat] = useState<number | null>(null)
   const [userLng, setUserLng] = useState<number | null>(null)
-  const [radiusMiles, setRadiusMiles] = useState(10)
+  const [radiusMiles, setRadiusMiles] = useState(25)
   const [geoLoading, setGeoLoading] = useState(false)
   const [geoError, setGeoError] = useState<string | null>(null)
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list')
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('spotlight-favorites')
+      if (stored) setFavorites(new Set(JSON.parse(stored)))
+    } catch {}
+  }, [])
+
+  function toggleFavorite(id: string) {
+    setFavorites((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      try {
+        localStorage.setItem('spotlight-favorites', JSON.stringify(Array.from(next)))
+      } catch {}
+      return next
+    })
+  }
 
   const userLocation = useMemo<[number, number] | null>(
     () => (userLat !== null && userLng !== null ? [userLat, userLng] : null),
@@ -93,9 +116,9 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
   const allTypesUrl = buildUrl({ city: searchParams.city, q: searchParams.q })
 
-  // Proximity controls — rendered in the sidebar (desktop) and the mobile collapsible section
+  // Proximity controls — shared between desktop sidebar and mobile collapsible
   const proximitySection = (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <button
         onClick={handleNearMe}
         disabled={geoLoading}
@@ -126,21 +149,23 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
       {geoError && <p className="text-xs text-red-600">{geoError}</p>}
 
       {userLocation && (
-        <>
-          <div className="flex flex-wrap gap-1">
-            {RADIUS_OPTIONS.map((r) => (
-              <button
-                key={r}
-                onClick={() => setRadiusMiles(r)}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                  radiusMiles === r
-                    ? 'bg-[#1877F2] text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {r} mi
-              </button>
-            ))}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500">Radius</span>
+            <span className="text-xs font-semibold text-[#1877F2]">{radiusMiles} mi</span>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={100}
+            step={1}
+            value={radiusMiles}
+            onChange={(e) => setRadiusMiles(Number(e.target.value))}
+            className="w-full accent-[#1877F2]"
+          />
+          <div className="flex justify-between text-xs text-gray-400">
+            <span>1 mi</span>
+            <span>100 mi</span>
           </div>
           <button
             onClick={clearLocation}
@@ -148,7 +173,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
           >
             Clear location filter
           </button>
-        </>
+        </div>
       )}
     </div>
   )
@@ -162,12 +187,12 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3">
-          {/* City filter */}
+          {/* City search */}
           <div className="mb-4">
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
               City
             </label>
-            <form method="GET" action="/spaces">
+            <form method="GET" action="/spaces" className="flex gap-1.5">
               {searchParams.type && (
                 <input type="hidden" name="type" value={searchParams.type} />
               )}
@@ -179,12 +204,21 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
                 type="text"
                 defaultValue={searchParams.city ?? ''}
                 placeholder="e.g. Chicago"
-                className="w-full rounded-lg border border-gray-300 bg-[#f0f2f5] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+                className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-[#f0f2f5] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
               />
+              <button
+                type="submit"
+                className="shrink-0 rounded-lg bg-[#1877F2] px-3 py-2 text-white transition-colors hover:bg-blue-700"
+                aria-label="Search city"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+                </svg>
+              </button>
             </form>
           </div>
 
-          {/* Type filter */}
+          {/* Space type */}
           <div className="mb-4">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
               Space type
@@ -218,7 +252,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
           {/* Proximity */}
           <div className="border-t border-gray-200 pt-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
               Proximity
             </p>
             {proximitySection}
@@ -275,9 +309,33 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
             </div>
           </div>
 
-          {/* Mobile proximity controls (collapsible) */}
+          {/* Mobile proximity + city search (collapsible) */}
           {showMobileFilters && (
-            <div className="mt-3 border-t border-gray-200 pt-3 md:hidden">
+            <div className="mt-3 space-y-3 border-t border-gray-200 pt-3 md:hidden">
+              <form method="GET" action="/spaces" className="flex gap-1.5">
+                {searchParams.type && (
+                  <input type="hidden" name="type" value={searchParams.type} />
+                )}
+                {searchParams.q && (
+                  <input type="hidden" name="q" value={searchParams.q} />
+                )}
+                <input
+                  name="city"
+                  type="text"
+                  defaultValue={searchParams.city ?? ''}
+                  placeholder="Search city…"
+                  className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-[#f0f2f5] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+                />
+                <button
+                  type="submit"
+                  className="shrink-0 rounded-lg bg-[#1877F2] px-3 py-2 text-white"
+                  aria-label="Search city"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+                  </svg>
+                </button>
+              </form>
               {proximitySection}
             </div>
           )}
@@ -300,8 +358,10 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
                 <SpaceCard
                   space={space}
                   isHighlighted={hoveredId === space.id}
+                  isFavorited={favorites.has(space.id)}
                   onMouseEnter={() => setHoveredId(space.id)}
                   onMouseLeave={() => setHoveredId(null)}
+                  onToggleFavorite={() => toggleFavorite(space.id)}
                 />
               </div>
             ))
@@ -310,9 +370,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
       </div>
 
       {/* ── Map column ── */}
-      <div
-        className={`flex-1 ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}
-      >
+      <div className={`flex-1 ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}`}>
         <SpaceMapWrapper
           markers={filteredMarkers}
           hoveredId={hoveredId}

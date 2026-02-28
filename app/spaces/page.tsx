@@ -31,7 +31,18 @@ export default async function SpacesPage({ searchParams }: SpacesPageProps) {
 
   const { spaces, mapMarkers } = hasSupabase
     ? await getSpaces({ q: searchParams.q, type: searchParams.type, city: searchParams.city })
-    : { spaces: MOCK_SPACES, mapMarkers: MOCK_MARKERS }
+    : {
+        spaces: MOCK_SPACES.filter(
+          (s) =>
+            (!searchParams.type || s.space_type === searchParams.type) &&
+            (!searchParams.city || s.city.toLowerCase().includes(searchParams.city.toLowerCase())),
+        ),
+        mapMarkers: MOCK_MARKERS.filter(
+          (m) =>
+            (!searchParams.type || m.space_type === searchParams.type) &&
+            (!searchParams.city || m.city.toLowerCase().includes(searchParams.city.toLowerCase())),
+        ),
+      }
 
   return (
     <>
