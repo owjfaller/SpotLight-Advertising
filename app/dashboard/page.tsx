@@ -3,12 +3,16 @@ import { createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/lib/queries/profiles'
 
 export default async function DashboardPage() {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  const profile = user ? await getProfile(user.id) : null
+  let user = null
+  let profile = null
+  try {
+    const supabase = createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+    if (user) profile = await getProfile(user.id)
+  } catch {
+    // Supabase not configured
+  }
   const name = profile?.full_name ?? user?.email?.split('@')[0] ?? 'there'
 
   const stats = [

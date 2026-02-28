@@ -3,10 +3,14 @@ import { createClient } from '@/lib/supabase/server'
 import NavbarActions from './NavbarActions'
 
 export default async function Navbar() {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const supabase = createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch {
+    // Supabase not configured yet
+  }
 
   return (
     <nav className="sticky top-0 z-50 h-14 border-b border-gray-300 bg-white shadow-sm">

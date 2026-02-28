@@ -14,6 +14,8 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) redirect('/login')
+
   const supabase = createClient()
   const {
     data: { user },
