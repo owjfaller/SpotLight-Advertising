@@ -21,11 +21,9 @@ export async function GET(request: NextRequest) {
   }
 
   let data: Record<string, unknown>[] | null = null
-  try {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const result = await getFilteredAdSpaces(filters)
     if (!result.error) data = result.data
-  } catch {
-    // Supabase not configured — fall through to mock data
   }
 
   // Fall back to mock data when DB is empty or not configured

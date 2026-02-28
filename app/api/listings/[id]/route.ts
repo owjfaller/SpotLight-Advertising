@@ -7,10 +7,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   let space = null
-  try {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     space = await getSpaceById(params.id)
-  } catch {
-    // Supabase not configured — fall through to mock data
   }
 
   if (!space) {
