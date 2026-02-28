@@ -1,14 +1,85 @@
 import Link from 'next/link'
 
 const categories = [
-  { emoji: '🪧', label: 'Billboards',      type: 'Billboard' },
-  { emoji: '🚚', label: 'Vehicle wraps',   type: 'Vehicle'   },
-  { emoji: '🏢', label: 'Indoor spaces',   type: 'Indoor'    },
-  { emoji: '🌳', label: 'Outdoor',         type: 'Outdoor'   },
-  { emoji: '📺', label: 'Digital screens', type: 'Digital'   },
-  { emoji: '🎪', label: 'Event signage',   type: 'Event'     },
-  { emoji: '🏪', label: 'Storefronts',     type: 'Indoor'    },
-  { emoji: '📦', label: 'Packaging',       type: 'Other'     },
+  {
+    label: 'Billboard',
+    type: 'Billboard',
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <rect x="6" y="8" width="28" height="17" rx="1.5" />
+        <line x1="20" y1="25" x2="20" y2="34" />
+        <line x1="14" y1="34" x2="26" y2="34" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Vehicle',
+    type: 'Vehicle',
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M4 26h32v-6l-4-8H8L4 20v6z" />
+        <circle cx="11" cy="29" r="3" />
+        <circle cx="29" cy="29" r="3" />
+        <path d="M8 18h10v-4H11l-3 4z" />
+        <line x1="18" y1="14" x2="18" y2="18" />
+        <rect x="18" y="14" width="10" height="4" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Indoor',
+    type: 'Indoor',
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M6 34V16L20 6l14 10v18" />
+        <rect x="15" y="23" width="10" height="11" />
+        <line x1="6" y1="34" x2="34" y2="34" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Outdoor',
+    type: 'Outdoor',
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <circle cx="20" cy="14" r="5" />
+        <line x1="20" y1="6" x2="20" y2="4" />
+        <line x1="20" y1="22" x2="20" y2="24" />
+        <line x1="28" y1="14" x2="30" y2="14" />
+        <line x1="10" y1="14" x2="12" y2="14" />
+        <line x1="25.7" y1="8.3" x2="27.1" y2="6.9" />
+        <line x1="12.9" y1="21.1" x2="14.3" y2="19.7" />
+        <line x1="25.7" y1="19.7" x2="27.1" y2="21.1" />
+        <line x1="12.9" y1="6.9" x2="14.3" y2="8.3" />
+        <path d="M4 34c3-6 6-9 10-9s7 4 12 4 8-5 10-9" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Digital',
+    type: 'Digital',
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <rect x="5" y="8" width="30" height="20" rx="2" />
+        <line x1="14" y1="34" x2="26" y2="34" />
+        <line x1="20" y1="28" x2="20" y2="34" />
+        <path d="M15 18l4 3 6-5" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Event',
+    type: 'Event',
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M4 34c4-12 8-18 16-18s12 6 16 18" />
+        <path d="M10 34c2-8 5-12 10-12s8 4 10 12" />
+        <line x1="20" y1="16" x2="20" y2="8" />
+        <line x1="4" y1="34" x2="36" y2="34" />
+        <circle cx="20" cy="7" r="1.5" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
 ]
 
 export default function HomePage() {
@@ -18,19 +89,17 @@ export default function HomePage() {
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden px-4 pb-24 pt-20 text-center" style={{ minHeight: '90vh', display: 'flex', alignItems: 'center' }}>
 
-        {/* Background video */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
+        {/* Background image */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/spotlight-hero.svg"
+          alt=""
+          aria-hidden
           className="pointer-events-none absolute inset-0 h-full w-full object-cover"
           style={{ zIndex: 0 }}
-        >
-          <source src="/videos/hero.mp4" type="video/mp4" />
-        </video>
+        />
 
-        {/* Dark overlay — keeps text readable over video */}
+        {/* Dark overlay */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -72,22 +141,13 @@ export default function HomePage() {
             >
               Browse spaces
             </Link>
-            <div className="flex flex-col items-center gap-2">
-              <Link
-                href="/signup"
-                className="rounded-lg border px-8 py-3.5 text-sm font-semibold transition hover:bg-white/5"
-                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              >
-                List your space
-              </Link>
-              <Link
-                href="/spaces/new"
-                className="text-xs transition hover:underline"
-                style={{ color: 'var(--text-faint)' }}
-              >
-                Continue without logging in
-              </Link>
-            </div>
+            <Link
+              href="/login"
+              className="rounded-lg border px-8 py-3.5 text-sm font-semibold transition hover:bg-white/5"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+            >
+              List your space
+            </Link>
           </div>
 
           <p className="mt-6 text-xs" style={{ color: 'var(--text-faint)' }}>
@@ -108,18 +168,41 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
-            {categories.map(({ emoji, label, type }) => (
+          <div className="grid grid-cols-3 gap-px md:grid-cols-6" style={{ background: 'var(--border)' }}>
+            {categories.map(({ label, type, icon }) => (
               <Link
                 key={label}
                 href={`/spaces?type=${type}`}
-                className="group flex flex-col items-center gap-2.5 rounded-xl border p-4 transition hover:border-amber-500/40 hover:bg-white/5"
-                style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+                className="group relative flex flex-col items-center justify-center gap-4 px-4 py-8 transition-colors"
+                style={{ background: 'var(--surface)' }}
               >
-                <span className="text-3xl transition-transform group-hover:scale-110">{emoji}</span>
-                <span className="text-center text-xs font-medium leading-tight" style={{ color: 'var(--text-muted)' }}>
+                {/* Amber fill on hover */}
+                <span
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  style={{ background: 'rgba(232,168,56,0.05)' }}
+                />
+
+                {/* Icon */}
+                <span
+                  className="relative block h-10 w-10"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  {icon}
+                </span>
+
+                {/* Label */}
+                <span
+                  className="relative text-xs font-medium tracking-wide uppercase"
+                  style={{ color: 'var(--accent)', letterSpacing: '0.08em' }}
+                >
                   {label}
                 </span>
+
+                {/* Amber bottom bar */}
+                <span
+                  className="absolute bottom-0 left-1/2 h-px -translate-x-1/2 transition-all duration-300 group-hover:w-full"
+                  style={{ background: 'var(--accent)', width: 0 }}
+                />
               </Link>
             ))}
           </div>
@@ -172,22 +255,13 @@ export default function HomePage() {
             <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               List it free and start earning from your idle surfaces. No fees until you close.
             </p>
-            <div className="mt-6 flex flex-col gap-2">
-              <Link
-                href="/signup"
-                className="inline-block rounded-lg px-6 py-3 text-sm font-semibold transition hover:scale-[1.02]"
-                style={{ background: 'var(--accent)', color: '#0d1117' }}
-              >
-                List a space
-              </Link>
-              <Link
-                href="/spaces/new"
-                className="text-xs transition hover:underline"
-                style={{ color: 'var(--text-faint)' }}
-              >
-                Continue without logging in
-              </Link>
-            </div>
+            <Link
+              href="/login"
+              className="mt-6 inline-block rounded-lg px-6 py-3 text-sm font-semibold transition hover:scale-[1.02]"
+              style={{ background: 'var(--accent)', color: '#0d1117' }}
+            >
+              List a space
+            </Link>
           </div>
 
           <div

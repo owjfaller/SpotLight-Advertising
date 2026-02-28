@@ -168,6 +168,20 @@ export default function LoginPage() {
               Sign up free
             </Link>
           </p>
+
+          <div className="mt-4 flex items-center gap-3">
+            <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+            <span className="text-xs" style={{ color: 'var(--text-faint)' }}>or</span>
+            <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+          </div>
+
+          <Link
+            href="/spaces/new"
+            className="mt-4 block w-full rounded-lg border py-3 text-center text-sm font-medium transition hover:bg-white/5"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+          >
+            Continue without logging in
+          </Link>
         </div>
       </div>
     </div>
