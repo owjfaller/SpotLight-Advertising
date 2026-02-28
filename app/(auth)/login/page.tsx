@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const searchParams = useSearchParams()
+  const message = searchParams.get('message')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -17,7 +19,8 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const fakeEmail = `${username.trim().toLowerCase()}@spotlight.local`
+    const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password })
 
     if (error) {
       setError(error.message)
@@ -33,7 +36,7 @@ export default function LoginPage() {
     const supabase = createClient()
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${location.origin}/auth/callback` },
+      options: { redirectTo: `${location.origin}/callback` },
     })
   }
 
@@ -86,14 +89,20 @@ export default function LoginPage() {
             Log in to your account to continue.
           </p>
 
+          {message && (
+            <p className="mt-4 rounded-lg px-3 py-2 text-sm" style={{ background: 'rgba(232,168,56,0.1)', color: 'var(--accent)' }}>
+              {message}
+            </p>
+          )}
+
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-3">
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
-              autoComplete="email"
-              placeholder="Email address"
+              autoComplete="username"
+              placeholder="Username"
               className="w-full rounded-lg border px-4 py-3 text-sm transition focus:outline-none"
               style={{
                 background: 'var(--surface)',

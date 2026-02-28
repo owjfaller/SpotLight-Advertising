@@ -7,7 +7,7 @@ import NavbarActions from './NavbarActions'
 
 export default function NavbarShell({ user }: { user: User | null }) {
   const pathname = usePathname()
-  const isLight = pathname.startsWith('/spaces') && pathname !== '/spaces/new'
+  const isLight = (pathname.startsWith('/spaces') && pathname !== '/spaces/new') || pathname.startsWith('/dashboard')
   const isBlack = pathname === '/spaces/new'
 
   return (
@@ -23,9 +23,20 @@ export default function NavbarShell({ user }: { user: User | null }) {
         {/* Logo */}
         <Link
           href="/"
-          className="font-display shrink-0 text-xl tracking-tight"
-          style={{ color: 'var(--accent)' }}
+          className="font-display shrink-0 flex items-center gap-2 text-3xl tracking-tight"
+          style={{ color: 'var(--accent)', marginRight: '16px' }}
         >
+          {/* Mini spotlight icon */}
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+            {/* Lamp head */}
+            <rect x="8" y="3" width="8" height="3.5" rx="1.2" fill="currentColor" opacity="0.9"/>
+            {/* Beam */}
+            <path d="M9 6.5L3 20h18L15 6.5z" fill="currentColor" opacity="0.25"/>
+            {/* Inner bright core */}
+            <path d="M10.5 6.5L6.5 17h11l-4-10.5z" fill="currentColor" opacity="0.45"/>
+            {/* Lens highlight */}
+            <ellipse cx="12" cy="6.8" rx="3.2" ry="1.1" fill="currentColor" opacity="1"/>
+          </svg>
           SpotLight
         </Link>
 

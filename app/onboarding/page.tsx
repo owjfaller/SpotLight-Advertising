@@ -4,37 +4,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-type Role = 'owner' | 'advertiser' | 'both'
-
-const roles = [
-  {
-    id: 'advertiser' as Role,
-    title: 'Advertiser',
-    description: "I'm looking to book ad space for my brand or campaign.",
-    icon: '📣',
-  },
-  {
-    id: 'owner' as Role,
-    title: 'Space owner',
-    description: "I have surfaces or inventory I want to monetize.",
-    icon: '🏷️',
-  },
-  {
-    id: 'both' as Role,
-    title: 'Both',
-    description: "I want to list spaces and find advertising opportunities.",
-    icon: '⚡',
-  },
-]
-
 export default function OnboardingPage() {
   const router = useRouter()
-  const [selected, setSelected] = useState<Role | null>(null)
+  const [displayName, setDisplayName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleContinue() {
-    if (!selected) return
+  async function handleContinue(e: React.FormEvent) {
+    e.preventDefault()
+    if (!displayName.trim()) return
     setLoading(true)
     setError(null)
 
@@ -48,12 +26,7 @@ export default function OnboardingPage() {
 
     const { error } = await supabase
       .from('profiles')
-      .update({
-        can_be_owner: selected === 'owner' || selected === 'both',
-        can_be_advertiser: selected === 'advertiser' || selected === 'both',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id)
+      .upsert({ id: user.id, display_name: displayName.trim() })
 
     if (error) {
       setError('Something went wrong. Please try again.')
@@ -69,58 +42,45 @@ export default function OnboardingPage() {
       className="flex min-h-[calc(100vh-56px)] items-center justify-center px-4 py-12"
       style={{ background: 'var(--bg)' }}
     >
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-md">
         <div className="mb-10 text-center">
           <h1 className="font-display text-3xl md:text-4xl" style={{ color: 'var(--text)' }}>
-            How will you use SpotLight?
+            What should we call you?
           </h1>
           <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-            You can change this anytime from your profile.
+            This is how your name will appear on your listings.
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          {roles.map((role) => {
-            const isSelected = selected === role.id
-            return (
-              <button
-                key={role.id}
-                onClick={() => setSelected(role.id)}
-                className="flex items-center gap-4 rounded-xl border p-5 text-left transition"
-                style={{
-                  background: isSelected ? 'rgba(232,168,56,0.08)' : 'var(--surface)',
-                  borderColor: isSelected ? 'var(--accent)' : 'var(--border)',
-                }}
-              >
-                <span className="mt-0.5 text-2xl">{role.icon}</span>
-                <div className="flex-1">
-                  <p className="font-semibold" style={{ color: 'var(--text)' }}>{role.title}</p>
-                  <p className="mt-0.5 text-sm" style={{ color: 'var(--text-muted)' }}>{role.description}</p>
-                </div>
-                <div
-                  className="ml-auto mt-1 h-4 w-4 shrink-0 rounded-full border-2 transition"
-                  style={{
-                    borderColor: isSelected ? 'var(--accent)' : 'var(--border)',
-                    background: isSelected ? 'var(--accent)' : 'transparent',
-                  }}
-                />
-              </button>
-            )
-          })}
-        </div>
+        <form onSubmit={handleContinue} className="flex flex-col gap-4">
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="e.g. Jane Smith or Acme Media Co."
+            required
+            autoFocus
+            className="w-full rounded-lg border px-4 py-3 text-sm focus:outline-none"
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--border)',
+              color: 'var(--text)',
+            }}
+          />
 
-        {error && (
-          <p className="mt-4 text-center text-sm" style={{ color: '#ff6b6b' }}>{error}</p>
-        )}
+          {error && (
+            <p className="text-sm" style={{ color: '#ff6b6b' }}>{error}</p>
+          )}
 
-        <button
-          onClick={handleContinue}
-          disabled={!selected || loading}
-          className="mt-6 w-full rounded-lg py-3 text-sm font-semibold transition hover:opacity-90 disabled:opacity-40"
-          style={{ background: 'var(--accent)', color: '#0d1117' }}
-        >
-          {loading ? 'Saving…' : 'Continue'}
-        </button>
+          <button
+            type="submit"
+            disabled={!displayName.trim() || loading}
+            className="w-full rounded-lg py-3 text-sm font-semibold transition hover:opacity-90 disabled:opacity-40"
+            style={{ background: 'var(--accent)', color: '#0d1117' }}
+          >
+            {loading ? 'Saving…' : 'Continue'}
+          </button>
+        </form>
       </div>
     </div>
   )

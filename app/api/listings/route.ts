@@ -5,7 +5,6 @@ import { getCoordinates } from '@/lib/utils/geocode'
 export async function POST(request: NextRequest) {
   const supabase = createClient()
 
-  // Get current user session
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -20,13 +19,19 @@ export async function POST(request: NextRequest) {
 
   const coords = await getCoordinates(location)
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', user.id)
+    .single()
+
   const { data, error } = await supabase
     .from('ad_spaces')
     .insert({
       title,
-      owner_id: user.id,
+      owner: profile?.display_name ?? null,
       space_type: type,
-      address: location,
+      location_address: location,
       city,
       lat: coords?.lat ?? null,
       lng: coords?.lng ?? null,
@@ -35,7 +40,7 @@ export async function POST(request: NextRequest) {
       price_cents: Math.round(Number(price) * 100),
       description: description || null,
       image_url: image_url || null,
-      status: 'published'
+      status: 'published',
     })
     .select('id')
     .single()

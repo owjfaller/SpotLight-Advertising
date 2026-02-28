@@ -49,46 +49,22 @@ export default async function DashboardPage() {
   ].filter((l) => l.show)
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8" style={{ background: 'var(--bg)' }}>
+    <div className="mx-auto max-w-3xl px-4 py-8">
 
       {/* Header */}
-      <div
-        className="mb-4 rounded-2xl border p-6"
-        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
-      >
+      <div className="mb-4 rounded-2xl border p-6" style={{ background: '#fff', borderColor: '#e5e7eb' }}>
         <div className="flex items-center gap-4">
           <div
             className="flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold"
-            style={{ background: 'rgba(232,168,56,0.15)', color: 'var(--accent)' }}
+            style={{ background: 'rgba(232,168,56,0.15)', color: '#e8a838' }}
           >
             {name[0]?.toUpperCase()}
           </div>
           <div>
-            <p className="font-semibold" style={{ color: 'var(--text)' }}>Hey, {name}</p>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{user?.email}</p>
+            <p className="font-semibold" style={{ color: '#111827' }}>Hey, {name}</p>
+            <p className="text-sm" style={{ color: '#6b7280' }}>{user?.email?.replace('@spotlight.local', '')}</p>
           </div>
         </div>
-
-        {profile && (
-          <div className="mt-4 flex gap-2">
-            {profile.can_be_owner && (
-              <span
-                className="rounded-full px-3 py-0.5 text-xs font-medium"
-                style={{ background: 'rgba(232,168,56,0.12)', color: 'var(--accent)' }}
-              >
-                Space owner
-              </span>
-            )}
-            {profile.can_be_advertiser && (
-              <span
-                className="rounded-full px-3 py-0.5 text-xs font-medium"
-                style={{ background: 'rgba(100,200,120,0.12)', color: '#6dc87a' }}
-              >
-                Advertiser
-              </span>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Stats */}
@@ -97,23 +73,20 @@ export default async function DashboardPage() {
           <div
             key={label}
             className="rounded-2xl border p-5 text-center"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            style={{ background: '#fff', borderColor: '#e5e7eb' }}
           >
-            <p className="text-xl" style={{ color: 'var(--text-faint)' }}>{icon}</p>
-            <p className="font-display mt-1 text-3xl" style={{ color: 'var(--text)' }}>{value}</p>
-            <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
+            <p className="text-xl" style={{ color: '#9ca3af' }}>{icon}</p>
+            <p className="font-display mt-1 text-3xl" style={{ color: '#111827' }}>{value}</p>
+            <p className="mt-1 text-xs" style={{ color: '#6b7280' }}>{label}</p>
           </div>
         ))}
       </div>
 
       {/* Actions */}
-      <div
-        className="rounded-2xl border"
-        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
-      >
+      <div className="rounded-2xl border" style={{ background: '#fff', borderColor: '#e5e7eb' }}>
         <p
           className="border-b px-5 py-4 text-xs font-semibold uppercase tracking-widest"
-          style={{ borderColor: 'var(--border)', color: 'var(--text-faint)' }}
+          style={{ borderColor: '#e5e7eb', color: '#9ca3af' }}
         >
           Quick actions
         </p>
@@ -122,18 +95,16 @@ export default async function DashboardPage() {
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-4 px-5 py-4 transition hover:bg-white/5"
-              style={{
-                borderTop: i > 0 ? `1px solid var(--border)` : undefined,
-              }}
+              className="flex items-center gap-4 px-5 py-4 transition hover:bg-gray-50"
+              style={{ borderTop: i > 0 ? '1px solid #e5e7eb' : undefined }}
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>{label}</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{sub}</p>
+                <p className="text-sm font-medium" style={{ color: '#111827' }}>{label}</p>
+                <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>{sub}</p>
               </div>
               <svg
                 className="h-4 w-4 shrink-0"
-                style={{ color: 'var(--text-faint)' }}
+                style={{ color: '#9ca3af' }}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}

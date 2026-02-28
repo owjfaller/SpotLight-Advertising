@@ -24,27 +24,26 @@ export default async function DashboardLayout({
   if (!user) redirect('/login')
 
   return (
-    <div className="flex min-h-[calc(100vh-56px)] bg-[#f0f2f5]">
+    <div className="flex min-h-[calc(100vh-56px)]" style={{ background: '#fff' }}>
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 bg-white border-r border-gray-200 md:block">
-        <div className="p-4 border-b border-gray-200">
-          <p className="font-bold text-gray-900">Selling</p>
-        </div>
-        <nav className="flex flex-col gap-0.5 p-3">
+      <aside className="hidden w-64 shrink-0 md:block" style={{ background: '#fff', borderRight: '1px solid #e5e7eb' }}>
+        <nav className="flex flex-col gap-0.5 p-3 pt-4">
           {navItems.map(({ href, label, emoji }) => (
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-[#f0f2f5]"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition hover:bg-gray-100"
+              style={{ color: '#374151' }}
             >
               <span className="text-lg">{emoji}</span>
               {label}
             </Link>
           ))}
-          <div className="mt-2 border-t border-gray-200 pt-2">
+          <div className="mt-2 border-t pt-2" style={{ borderColor: '#e5e7eb' }}>
             <Link
               href="/spaces/new"
-              className="flex items-center gap-3 rounded-lg bg-[#1877F2] px-3 py-2.5 text-sm font-semibold text-white hover:bg-[#166fe5] transition"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition hover:opacity-90"
+              style={{ background: '#e8a838', color: '#0d1117' }}
             >
               <span>+</span>
               New listing
