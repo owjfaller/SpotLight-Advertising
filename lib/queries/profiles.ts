@@ -27,8 +27,8 @@ export async function updateProfile(
 }
 
 export async function getUserInfo(userId: string): Promise<{
-  published: any[] | null;
-  interestedIn: any[] | null;
+  published: Record<string, unknown>[] | null;
+  interestedIn: Record<string, unknown>[] | null;
   error: string | null;
 }> {
   const supabase = createClient()

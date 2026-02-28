@@ -57,7 +57,7 @@ export async function addAdSpace(params: {
 
 export async function getFilteredAdSpaces(
   filters: AdSpaceFilters
-): Promise<{ data: any[] | null; error: string | null }> {
+): Promise<{ data: Record<string, unknown>[] | null; error: string | null }> {
   const supabase = createClient()
   let query = supabase.from('ad_spaces').select('*').eq('status', 'published')
 

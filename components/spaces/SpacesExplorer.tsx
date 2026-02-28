@@ -150,17 +150,6 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
     outline: 'none',
   }
 
-  const inputStyle = {
-    background: 'var(--bg)',
-    border: '1px solid var(--border)',
-    color: 'var(--text)',
-    borderRadius: '0.5rem',
-    fontSize: '0.8125rem',
-    padding: '0.5rem 0.75rem',
-    width: '100%',
-    outline: 'none',
-  }
-
   // ── Reusable sidebar sections ──────────────────────────────────────────────
 
   const priceRangeSection = (
@@ -314,7 +303,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
         className="hidden md:flex w-60 shrink-0 flex-col overflow-hidden"
         style={{ background: '#fff', borderRight: '1px solid #e5e7eb' }}
       >
-        <div className="flex-none px-5 py-4" style={{ background: '#e8a838', borderBottom: '1px solid #d4922a' }}>
+        <div className="flex-none px-5 py-2.5" style={{ background: '#e8a838', borderBottom: '1px solid #d4922a' }}>
           <h1
             className="font-display"
             style={{ fontSize: '1.35rem', color: '#0d1117', letterSpacing: '-0.01em' }}

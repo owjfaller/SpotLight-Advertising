@@ -21,12 +21,12 @@ export default async function SpacesPage({ searchParams }: SpacesPageProps) {
         spaces: MOCK_SPACES.filter(
           (s) =>
             (!searchParams.type || s.space_type === searchParams.type) &&
-            (!searchParams.city || s.city.toLowerCase().includes(searchParams.city.toLowerCase())),
+            (!searchParams.city || (s.city ?? '').toLowerCase().includes(searchParams.city.toLowerCase())),
         ),
         mapMarkers: MOCK_MARKERS.filter(
           (m) =>
             (!searchParams.type || m.space_type === searchParams.type) &&
-            (!searchParams.city || m.city.toLowerCase().includes(searchParams.city.toLowerCase())),
+            (!searchParams.city || (m.city ?? '').toLowerCase().includes(searchParams.city.toLowerCase())),
         ),
       }
 

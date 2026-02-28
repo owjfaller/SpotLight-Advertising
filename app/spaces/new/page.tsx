@@ -79,43 +79,40 @@ export default function NewListingPage() {
   }
 
   const inputStyle = {
-    background: 'var(--surface)',
-    borderColor: 'var(--border)',
-    color: 'var(--text)',
+    background: '#fff',
+    borderColor: '#e5e7eb',
+    color: '#111827',
   }
 
-  const labelStyle = { color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }
+  const labelStyle = { color: '#6b7280', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }
 
   return (
-    <div className="min-h-screen px-4 py-10" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-screen px-4 py-10" style={{ background: '#f5f5f5' }}>
       <div className="mx-auto max-w-2xl">
 
         {/* Header */}
         <div className="mb-8">
           <Link
             href="/dashboard"
-            className="mb-4 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-white/5"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+            className="mb-4 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-gray-100"
+            style={{ borderColor: '#e5e7eb', color: '#6b7280' }}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
             Dashboard
           </Link>
-          <h1 className="font-display text-3xl md:text-4xl" style={{ color: 'var(--text)' }}>
+          <h1 className="font-display text-3xl md:text-4xl" style={{ color: '#111827' }}>
             Create a listing
           </h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>
             Fill in the details below to publish your ad space.
           </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
-          <div
-            className="rounded-2xl border divide-y"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)', divideColor: 'var(--border)' }}
-          >
+          <div className="rounded-2xl border divide-y" style={{ background: '#fff', borderColor: '#e5e7eb' }}>
 
             {/* Title */}
             <div className="p-6 flex flex-col gap-2">
@@ -182,7 +179,7 @@ export default function NewListingPage() {
               <label style={labelStyle}>Availability window</label>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-xs" style={{ color: 'var(--text-faint)' }}>Start date</span>
+                  <span className="text-xs" style={{ color: '#9ca3af' }}>Start date</span>
                   <input
                     name="start_date"
                     type="date"
@@ -194,7 +191,7 @@ export default function NewListingPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-xs" style={{ color: 'var(--text-faint)' }}>End date</span>
+                  <span className="text-xs" style={{ color: '#9ca3af' }}>End date</span>
                   <input
                     name="end_date"
                     type="date"
@@ -212,7 +209,7 @@ export default function NewListingPage() {
             <div className="p-6 flex flex-col gap-2">
               <label style={labelStyle}>Monthly price (USD)</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--text-muted)' }}>$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm" style={{ color: '#9ca3af' }}>$</span>
                 <input
                   name="price"
                   type="number"
@@ -230,23 +227,23 @@ export default function NewListingPage() {
 
             {/* Image */}
             <div className="p-6 flex flex-col gap-3">
-              <label style={labelStyle}>Photo <span style={{ color: 'var(--text-faint)', textTransform: 'none', fontWeight: 400 }}>(optional)</span></label>
+              <label style={labelStyle}>Photo <span style={{ color: '#9ca3af', textTransform: 'none', fontWeight: 400 }}>(optional)</span></label>
 
               {imagePreview ? (
                 <div className="relative aspect-video w-full overflow-hidden rounded-xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                   {uploading && (
-                    <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(13,17,23,0.6)' }}>
-                      <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>Uploading…</p>
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                      <p className="text-sm font-medium text-white">Uploading…</p>
                     </div>
                   )}
                   {!uploading && (
                     <button
                       type="button"
                       onClick={() => { setImagePreview(null); setImageUrl(null) }}
-                      className="absolute right-2 top-2 rounded-full px-3 py-1 text-xs font-medium transition hover:opacity-90"
-                      style={{ background: 'rgba(13,17,23,0.7)', color: 'var(--text)' }}
+                      className="absolute right-2 top-2 rounded-full px-3 py-1 text-xs font-medium text-white transition hover:opacity-90"
+                      style={{ background: 'rgba(0,0,0,0.5)' }}
                     >
                       Remove
                     </button>
@@ -254,14 +251,14 @@ export default function NewListingPage() {
                 </div>
               ) : (
                 <label
-                  className="flex aspect-video w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition hover:bg-white/5"
-                  style={{ borderColor: 'var(--border)' }}
+                  className="flex aspect-video w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition hover:bg-gray-50"
+                  style={{ borderColor: '#e5e7eb' }}
                 >
-                  <svg className="h-8 w-8" style={{ color: 'var(--text-faint)' }} fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" aria-hidden>
+                  <svg className="h-8 w-8" style={{ color: '#d1d5db' }} fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                   </svg>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Click to upload a photo</p>
-                  <p className="text-xs" style={{ color: 'var(--text-faint)' }}>JPG, PNG, WEBP up to 10MB</p>
+                  <p className="text-sm" style={{ color: '#6b7280' }}>Click to upload a photo</p>
+                  <p className="text-xs" style={{ color: '#9ca3af' }}>JPG, PNG, WEBP up to 10MB</p>
                   <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                 </label>
               )}
@@ -269,7 +266,7 @@ export default function NewListingPage() {
 
             {/* Description */}
             <div className="p-6 flex flex-col gap-2">
-              <label style={labelStyle}>Description <span style={{ color: 'var(--text-faint)', textTransform: 'none', fontWeight: 400 }}>(optional)</span></label>
+              <label style={labelStyle}>Description <span style={{ color: '#9ca3af', textTransform: 'none', fontWeight: 400 }}>(optional)</span></label>
               <textarea
                 name="description"
                 value={form.description}
@@ -284,7 +281,7 @@ export default function NewListingPage() {
           </div>
 
           {error && (
-            <p className="mt-4 rounded-lg px-4 py-3 text-sm" style={{ background: 'rgba(255,80,80,0.1)', color: '#ff6b6b' }}>
+            <p className="mt-4 rounded-lg px-4 py-3 text-sm" style={{ background: 'rgba(255,80,80,0.1)', color: '#ef4444' }}>
               {error}
             </p>
           )}
@@ -293,7 +290,7 @@ export default function NewListingPage() {
             type="submit"
             disabled={loading}
             className="mt-4 w-full rounded-lg py-3.5 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
-            style={{ background: 'var(--accent)', color: '#0d1117' }}
+            style={{ background: '#e8a838', color: '#0d1117' }}
           >
             {loading ? 'Publishing…' : 'Publish listing'}
           </button>
