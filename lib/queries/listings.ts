@@ -82,7 +82,7 @@ export async function getFilteredListings(
   filters: ListingFilters
 ): Promise<{ data: any[] | null; error: string | null }> {
   const supabase = createClient()
-  let query = supabase.from('listings').select('*')
+  let query = supabase.from('ad_spaces').select('*')
 
   // Price "between" logic: defaults low_price to 0 if not provided
   const lowPrice = filters.low_price ?? 0

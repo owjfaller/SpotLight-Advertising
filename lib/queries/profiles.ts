@@ -35,7 +35,7 @@ export async function getUserInfo(username: string): Promise<{
 
   // 1. Get listings published by this user
   const { data: published, error: pubError } = await supabase
-    .from('listings')
+    .from('ad_spaces')
     .select('*')
     .eq('owner', username)
 
@@ -49,11 +49,11 @@ export async function getUserInfo(username: string): Promise<{
       username,
       added_at,
       listing_id,
-      listings!inner (
+      ad_spaces!inner (
         title
       )
     `)
-    .eq('listings.owner', username)
+    .eq('ad_spaces.owner', username)
 
   if (rentError) return { published, rentingTo: null, error: rentError.message }
 
