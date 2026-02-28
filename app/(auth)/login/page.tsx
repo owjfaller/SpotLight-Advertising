@@ -9,7 +9,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -19,8 +19,7 @@ function LoginForm() {
     setLoading(true)
     setError(null)
     const supabase = createClient()
-    const fakeEmail = `${username.trim().toLowerCase()}@spotlight.local`
-    const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password })
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
 
     if (error) {
       setError(error.message)
@@ -97,12 +96,12 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-3">
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="username"
-              placeholder="Username"
+              autoComplete="email"
+              placeholder="Email address"
               className="w-full rounded-lg border px-4 py-3 text-sm transition focus:outline-none"
               style={{
                 background: 'var(--surface)',
