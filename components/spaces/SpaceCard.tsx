@@ -35,7 +35,9 @@ export default function SpaceCard({
   const [imgError, setImgError] = useState(false)
 
   const color = typeColors[space.space_type] ?? '#1a2130'
-  const imageUrl = (space as any).image_url ?? null
+  const uploadedUrl = (space as any).image_url ?? null
+  const placeholderUrl = `https://picsum.photos/seed/${space.id}/400/300`
+  const imageUrl = uploadedUrl ?? placeholderUrl
   const hasImage = imageUrl && !imgError
 
   return (
@@ -49,27 +51,18 @@ export default function SpaceCard({
       <div
         className="relative aspect-[4/3] w-full rounded-xl overflow-hidden flex items-center justify-center transition-all duration-200 group-hover:shadow-lg"
         style={{
-          background: hasImage ? color : '#2a2f3a',
+          background: color,
           boxShadow: isHighlighted ? `0 0 0 2px var(--accent)` : undefined,
         }}
       >
-        {hasImage ? (
-          <>
-            <img
-              src={imageUrl}
-              alt={space.title}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-              loading="lazy"
-              onError={() => setImgError(true)}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-          </>
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{ background: `linear-gradient(135deg, ${color}dd, ${color}88)` }}
-          />
-        )}
+        <img
+          src={imageUrl}
+          alt={space.title}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
         {/* Price overlay bottom-left */}
         <div className="absolute bottom-2.5 left-2.5">
