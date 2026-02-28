@@ -38,19 +38,55 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-56px)] items-center justify-center bg-[#f0f2f5] px-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="mb-6 text-center">
-          <p className="text-4xl font-bold text-[#1877F2]">SpotLight</p>
-          <p className="mt-1 text-base text-gray-600">
-            Log in to discover and book unique ad spaces.
+    <div className="flex min-h-[calc(100vh-56px)]" style={{ background: 'var(--bg)' }}>
+
+      {/* Left brand panel */}
+      <div
+        className="hidden md:flex md:w-1/2 flex-col justify-between p-12 relative overflow-hidden"
+        style={{ background: 'var(--surface)' }}
+      >
+        {/* Decorative circle */}
+        <div
+          className="pointer-events-none absolute -bottom-32 -left-32 rounded-full opacity-10"
+          style={{ width: 500, height: 500, background: 'var(--accent)' }}
+        />
+        <div
+          className="pointer-events-none absolute -top-24 -right-24 rounded-full border opacity-10"
+          style={{ width: 400, height: 400, borderColor: 'var(--accent)' }}
+        />
+
+        <Link href="/" className="font-display text-3xl relative z-10" style={{ color: 'var(--accent)' }}>
+          SpotLight
+        </Link>
+
+        <div className="relative z-10">
+          <p className="font-display text-4xl leading-snug" style={{ color: 'var(--text)' }}>
+            Every blank wall<br />is an opportunity.
+          </p>
+          <p className="mt-4 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Thousands of advertisers and space owners connect here every day.
           </p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-xl bg-white p-6 shadow-md">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <p className="text-xs relative z-10" style={{ color: 'var(--text-faint)' }}>
+          © {new Date().getFullYear()} SpotLight
+        </p>
+      </div>
+
+      {/* Right form panel */}
+      <div className="flex w-full items-center justify-center px-6 py-12 md:w-1/2">
+        <div className="w-full max-w-sm">
+          {/* Mobile logo */}
+          <Link href="/" className="font-display mb-8 block text-2xl md:hidden" style={{ color: 'var(--accent)' }}>
+            SpotLight
+          </Link>
+
+          <h1 className="font-display text-3xl" style={{ color: 'var(--text)' }}>Welcome back</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+            Log in to your account to continue.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-3">
             <input
               type="email"
               value={email}
@@ -58,7 +94,12 @@ export default function LoginPage() {
               required
               autoComplete="email"
               placeholder="Email address"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-[#1877F2] focus:outline-none focus:ring-2 focus:ring-[#1877F2]/30"
+              className="w-full rounded-lg border px-4 py-3 text-sm transition focus:outline-none"
+              style={{
+                background: 'var(--surface)',
+                borderColor: 'var(--border)',
+                color: 'var(--text)',
+              }}
             />
             <input
               type="password"
@@ -67,35 +108,50 @@ export default function LoginPage() {
               required
               autoComplete="current-password"
               placeholder="Password"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-[#1877F2] focus:outline-none focus:ring-2 focus:ring-[#1877F2]/30"
+              className="w-full rounded-lg border px-4 py-3 text-sm transition focus:outline-none"
+              style={{
+                background: 'var(--surface)',
+                borderColor: 'var(--border)',
+                color: 'var(--text)',
+              }}
             />
 
             {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+              <p
+                className="rounded-lg px-3 py-2 text-sm"
+                style={{ background: 'rgba(255,80,80,0.1)', color: '#ff6b6b' }}
+              >
+                {error}
+              </p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-[#1877F2] py-3 text-base font-bold text-white hover:bg-[#166fe5] transition disabled:opacity-60"
+              className="w-full rounded-lg py-3 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
+              style={{ background: 'var(--accent)', color: '#0d1117' }}
             >
               {loading ? 'Logging in…' : 'Log in'}
             </button>
 
-            <p className="text-center text-sm font-medium text-[#1877F2] hover:underline cursor-pointer">
+            <p
+              className="text-center text-sm font-medium cursor-pointer hover:opacity-80 transition"
+              style={{ color: 'var(--text-muted)' }}
+            >
               Forgot password?
             </p>
           </form>
 
-          <div className="my-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-sm text-gray-400">or</span>
-            <div className="h-px flex-1 bg-gray-200" />
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+            <span className="text-xs" style={{ color: 'var(--text-faint)' }}>or</span>
+            <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
           </div>
 
           <button
             onClick={handleGoogle}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border py-3 text-sm font-medium transition hover:bg-white/5"
+            style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -106,14 +162,12 @@ export default function LoginPage() {
             Continue with Google
           </button>
 
-          <div className="mt-5 border-t border-gray-200 pt-5 text-center">
-            <Link
-              href="/signup"
-              className="inline-block rounded-lg border border-gray-300 bg-[#36a420] px-6 py-3 text-sm font-bold text-white hover:bg-[#2d8a1b] transition"
-            >
-              Create new account
+          <p className="mt-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="font-semibold transition hover:opacity-80" style={{ color: 'var(--accent)' }}>
+              Sign up free
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>

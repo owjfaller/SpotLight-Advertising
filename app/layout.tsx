@@ -1,17 +1,21 @@
 import type { Metadata } from 'next'
-import localFont from 'next/font/local'
+import { DM_Serif_Display, DM_Sans } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
+const dmSerif = DM_Serif_Display({
+  weight: ['400'],
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
 })
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
+
+const dmSans = DM_Sans({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -27,9 +31,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${dmSerif.variable} ${dmSans.variable}`}>
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   )

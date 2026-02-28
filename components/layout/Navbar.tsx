@@ -13,18 +13,33 @@ export default async function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 h-14 border-b border-gray-300 bg-white shadow-sm">
+    <nav
+      className="sticky top-0 z-50 h-14 border-b"
+      style={{
+        background: 'rgba(13,17,23,0.92)',
+        backdropFilter: 'blur(12px)',
+        borderColor: 'var(--border)',
+      }}
+    >
       <div className="mx-auto flex h-full max-w-7xl items-center gap-3 px-4">
         {/* Logo */}
-        <Link href="/" className="shrink-0 text-xl font-bold text-[#1877F2]">
+        <Link
+          href="/"
+          className="font-display shrink-0 text-xl tracking-tight"
+          style={{ color: 'var(--accent)' }}
+        >
           SpotLight
         </Link>
 
         {/* Search bar */}
         <form action="/spaces" method="GET" className="flex flex-1 max-w-sm">
-          <div className="flex w-full items-center rounded-full bg-[#f0f2f5] px-4 py-1.5">
+          <div
+            className="flex w-full items-center rounded-full px-4 py-1.5 border"
+            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+          >
             <svg
-              className="mr-2 h-4 w-4 shrink-0 text-gray-500"
+              className="mr-2 h-3.5 w-3.5 shrink-0"
+              style={{ color: 'var(--text-muted)' }}
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
@@ -40,8 +55,9 @@ export default async function Navbar() {
             <input
               name="q"
               type="search"
-              placeholder="Search SpotLight"
-              className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-500 focus:outline-none"
+              placeholder="Search spaces…"
+              className="w-full bg-transparent text-sm focus:outline-none"
+              style={{ color: 'var(--text)', '--tw-placeholder-opacity': '1' } as React.CSSProperties}
             />
           </div>
         </form>
@@ -50,14 +66,16 @@ export default async function Navbar() {
         <div className="hidden items-center gap-1 md:flex">
           <Link
             href="/spaces"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+            className="rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-white/5"
+            style={{ color: 'var(--text-muted)' }}
           >
             Browse
           </Link>
           {user && (
             <Link
               href="/dashboard"
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+              className="rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-white/5"
+              style={{ color: 'var(--text-muted)' }}
             >
               Dashboard
             </Link>

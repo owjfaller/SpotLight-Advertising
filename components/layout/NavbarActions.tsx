@@ -17,14 +17,13 @@ export default function NavbarActions({ user }: { user: User | null }) {
 
   if (user) {
     return (
-      <div className="flex items-center gap-2">
-        <button
-          onClick={handleSignOut}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-        >
-          Sign out
-        </button>
-      </div>
+      <button
+        onClick={handleSignOut}
+        className="rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-white/5"
+        style={{ color: 'var(--text-muted)' }}
+      >
+        Sign out
+      </button>
     )
   }
 
@@ -32,13 +31,20 @@ export default function NavbarActions({ user }: { user: User | null }) {
     <div className="flex items-center gap-2">
       <Link
         href="/login"
-        className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+        className="rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-white/5"
+        style={{ color: 'var(--text-muted)' }}
       >
         Log in
       </Link>
       <Link
         href="/signup"
-        className="rounded-lg bg-[#1877F2] px-4 py-2 text-sm font-semibold text-white hover:bg-[#166fe5] transition"
+        className="rounded-lg px-4 py-2 text-sm font-semibold transition"
+        style={{
+          background: 'var(--accent)',
+          color: '#0d1117',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--accent-hover)')}
+        onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--accent)')}
       >
         Sign up
       </Link>

@@ -15,12 +15,12 @@ interface SpaceCardProps {
 }
 
 const typeColors: Record<string, string> = {
-  Billboard: 'bg-blue-100',
-  Vehicle:   'bg-amber-100',
-  Indoor:    'bg-green-100',
-  Outdoor:   'bg-sky-100',
-  Digital:   'bg-purple-100',
-  Event:     'bg-pink-100',
+  Billboard: '#1e3a5f',
+  Vehicle:   '#3d2a0a',
+  Indoor:    '#0f2e1a',
+  Outdoor:   '#0f2a2e',
+  Digital:   '#1e1040',
+  Event:     '#2e0f2a',
 }
 
 const typeEmojis: Record<string, string> = {
@@ -42,9 +42,8 @@ export default function SpaceCard({
 }: SpaceCardProps) {
   const [imgError, setImgError] = useState(false)
 
-  const color   = typeColors[space.space_type] ?? 'bg-gray-100'
-  const emoji   = typeEmojis[space.space_type] ?? '📍'
-  // Deterministic unique image per listing — seed is stable per space ID
+  const color = typeColors[space.space_type] ?? '#1a2130'
+  const emoji = typeEmojis[space.space_type] ?? '📍'
   const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/600/400`
 
   return (
@@ -54,38 +53,49 @@ export default function SpaceCard({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* Square image area */}
+      {/* Image */}
       <div
-        className={`relative aspect-square w-full rounded-lg overflow-hidden flex items-center justify-center transition-shadow ${
-          imgError ? color : ''
-        } ${isHighlighted ? 'ring-2 ring-blue-600 ring-offset-1' : ''}`}
+        className="relative aspect-[4/3] w-full rounded-xl overflow-hidden flex items-center justify-center transition-all duration-200 group-hover:shadow-lg"
+        style={{
+          background: color,
+          boxShadow: isHighlighted ? `0 0 0 2px var(--accent)` : undefined,
+        }}
       >
-        {/* Photo background — eslint-disable-next-line @next/next/no-img-element */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         {!imgError && (
           <img
             src={imageUrl}
             alt={space.title}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
             loading="lazy"
             onError={() => setImgError(true)}
           />
         )}
 
-        {/* Fallback emoji */}
         {imgError && <span className="text-5xl">{emoji}</span>}
 
-        {/* Gradient overlay so badges stay readable over photos */}
         {!imgError && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         )}
 
-        {/* Type badge */}
-        <span className="absolute bottom-2 left-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
+        {/* Price overlay bottom-left */}
+        <div className="absolute bottom-2.5 left-2.5">
+          <span
+            className="rounded-md px-2 py-1 text-xs font-bold backdrop-blur-sm"
+            style={{ background: 'rgba(13,17,23,0.75)', color: 'var(--accent)' }}
+          >
+            {formatPrice(space.price_cents)}/mo
+          </span>
+        </div>
+
+        {/* Type badge bottom-right */}
+        <span
+          className="absolute bottom-2.5 right-2.5 rounded-md px-2 py-0.5 text-xs font-medium backdrop-blur-sm"
+          style={{ background: 'rgba(13,17,23,0.6)', color: 'rgba(255,255,255,0.85)' }}
+        >
           {space.space_type}
         </span>
 
-        {/* Favorite star */}
+        {/* Favorite button */}
         <button
           onClick={(e) => {
             e.preventDefault()
@@ -93,13 +103,14 @@ export default function SpaceCard({
             onToggleFavorite?.(e)
           }}
           aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
-          className="absolute right-2 top-2 rounded-full bg-white/80 p-1 shadow-sm transition-colors hover:bg-white"
+          className="absolute right-2 top-2 rounded-full p-1.5 transition-colors hover:bg-white/20"
+          style={{ background: 'rgba(13,17,23,0.5)' }}
         >
           <svg
-            className="h-4 w-4"
+            className="h-3.5 w-3.5"
             viewBox="0 0 24 24"
-            fill={isFavorited ? '#f59e0b' : 'none'}
-            stroke={isFavorited ? '#f59e0b' : '#6b7280'}
+            fill={isFavorited ? '#e8a838' : 'none'}
+            stroke={isFavorited ? '#e8a838' : 'rgba(255,255,255,0.7)'}
             strokeWidth={2}
             aria-hidden
           >
@@ -112,15 +123,15 @@ export default function SpaceCard({
         </button>
       </div>
 
-      {/* Info below image */}
-      <div className="mt-1.5 px-0.5">
-        <p className="text-base font-bold text-gray-900">
-          {formatPrice(space.price_cents)}/mo
-        </p>
-        <p className="mt-0.5 text-sm font-medium text-gray-800 line-clamp-1 group-hover:underline">
+      {/* Info */}
+      <div className="mt-2 px-0.5">
+        <p
+          className="text-sm font-medium line-clamp-1 transition-colors group-hover:opacity-80"
+          style={{ color: 'var(--text)' }}
+        >
           {space.title}
         </p>
-        <p className="text-xs text-gray-500">{space.city}</p>
+        <p className="mt-0.5 text-xs" style={{ color: 'var(--text-muted)' }}>{space.city}</p>
       </div>
     </Link>
   )
