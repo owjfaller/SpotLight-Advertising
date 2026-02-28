@@ -116,7 +116,7 @@ export default function ContactBlock({ listingTitle, ownerName }: ContactBlockPr
       {/* ── CTA button ─────────────────────────────────────── */}
       <button
         onClick={openChat}
-        className="w-full rounded-lg bg-[#1877F2] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#166fe5]"
+        className="w-full rounded-lg bg-[#e8a838] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#cf9230]"
       >
         I&apos;m Interested
       </button>
@@ -154,9 +154,9 @@ export default function ContactBlock({ listingTitle, ownerName }: ContactBlockPr
                   <button
                     key={p.id}
                     onClick={() => selectPreset(p.id, p.label)}
-                    className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-medium text-gray-800 transition-colors hover:border-[#1877F2] hover:bg-blue-50 hover:text-[#1877F2]"
+                    className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3.5 text-left text-sm font-medium text-gray-800 transition-colors hover:border-[#e8a838] hover:bg-amber-50 hover:text-[#e8a838]"
                   >
-                    <span className="text-[#1877F2]">{p.icon}</span>
+                    <span className="text-[#e8a838]">{p.icon}</span>
                     {p.label}
                   </button>
                 ))}
@@ -181,7 +181,7 @@ export default function ContactBlock({ listingTitle, ownerName }: ContactBlockPr
                       <div
                         className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                           msg.sender === 'user'
-                            ? 'rounded-br-sm bg-[#1877F2] text-white'
+                            ? 'rounded-br-sm bg-[#e8a838] text-white'
                             : 'rounded-bl-sm bg-gray-100 text-gray-800'
                         }`}
                       >
@@ -205,12 +205,12 @@ export default function ContactBlock({ listingTitle, ownerName }: ContactBlockPr
                     }}
                     placeholder="Type a message…"
                     rows={1}
-                    className="flex-1 resize-none rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+                    className="flex-1 resize-none rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#e8a838] focus:border-[#e8a838]"
                   />
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || sending}
-                    className="shrink-0 rounded-xl bg-[#1877F2] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#166fe5] disabled:opacity-40"
+                    className="shrink-0 rounded-xl bg-[#e8a838] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#cf9230] disabled:opacity-40"
                   >
                     Send
                   </button>

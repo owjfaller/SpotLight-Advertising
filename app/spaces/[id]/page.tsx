@@ -81,7 +81,7 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
       <div className="mx-auto max-w-5xl px-4 py-5">
         <Link
           href="/spaces"
-          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#1877F2] hover:underline"
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#e8a838] hover:underline"
         >
           ← Back to listings
         </Link>
@@ -94,7 +94,7 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
             {/* Title + price */}
             <div className="rounded-xl bg-white p-6 shadow-sm">
               <h1 className="text-2xl font-bold text-gray-900">{space.title}</h1>
-              <p className="mt-2 text-3xl font-bold text-[#1877F2]">
+              <p className="mt-2 text-3xl font-bold text-[#e8a838]">
                 {formatPrice(space.price_cents)}
                 <span className="text-base font-normal text-gray-500">/mo</span>
               </p>
@@ -107,7 +107,7 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
               </h2>
               <div className="flex items-start gap-3">
                 <svg
-                  className="mt-0.5 h-5 w-5 shrink-0 text-[#1877F2]"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-[#e8a838]"
                   fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -203,7 +203,7 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
                 Listed by
               </h2>
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-[#1877F2]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold" style={{ background: 'rgba(232,168,56,0.15)', color: '#e8a838' }}>
                   {extras.owner_name.charAt(0)}
                 </div>
                 <div>
