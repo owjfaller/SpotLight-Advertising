@@ -7,7 +7,7 @@ import { AdSpace, AdSpaceMapMarker } from '@/lib/types/database.types'
 import { haversineDistance } from '@/lib/utils/haversine'
 
 const SPACE_TYPES   = ['Billboard', 'Vehicle', 'Indoor', 'Outdoor', 'Digital', 'Event']
-const PRICE_MAX     = 5000   // slider ceiling — $5,000 /mo
+const PRICE_MAX     = 5000
 const today         = new Date().toISOString().split('T')[0]
 
 interface SpacesExplorerProps {
@@ -29,6 +29,14 @@ function buildUrl(params: Record<string, string | undefined>): string {
   return `/spaces${s ? `?${s}` : ''}`
 }
 
+const sectionLabel = {
+  fontSize: '0.65rem',
+  fontWeight: 700,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase' as const,
+  color: '#9a8c7a',
+  marginBottom: '0.5rem',
+}
 
 export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: SpacesExplorerProps) {
   // ── State ──────────────────────────────────────────────────────────────────
@@ -46,7 +54,6 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   const [startDate,          setStartDate]          = useState('')
   const [endDate,            setEndDate]            = useState('')
 
-  // Load favorites from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem('spotlight-favorites')
@@ -131,13 +138,36 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   // ── URL helpers ────────────────────────────────────────────────────────────
   const allTypesUrl = buildUrl({ city: searchParams.city, q: searchParams.q })
 
+  // ── Shared input style ─────────────────────────────────────────────────────
+  const sidebarInputStyle = {
+    background: '#f7f3ed',
+    border: '1px solid #e5ddd0',
+    color: '#1a1208',
+    borderRadius: '0.5rem',
+    fontSize: '0.8125rem',
+    padding: '0.5rem 0.75rem',
+    width: '100%',
+    outline: 'none',
+  }
+
+  const inputStyle = {
+    background: 'var(--bg)',
+    border: '1px solid var(--border)',
+    color: 'var(--text)',
+    borderRadius: '0.5rem',
+    fontSize: '0.8125rem',
+    padding: '0.5rem 0.75rem',
+    width: '100%',
+    outline: 'none',
+  }
+
   // ── Reusable sidebar sections ──────────────────────────────────────────────
 
   const priceRangeSection = (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">Min</span>
-        <span className="text-xs font-semibold text-[#1877F2]">
+        <span style={{ fontSize: '0.75rem', color: '#9a8c7a' }}>Min</span>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#b07d10' }}>
           ${minPriceDollars.toLocaleString()}/mo
         </span>
       </div>
@@ -151,11 +181,11 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
           const v = Number(e.target.value)
           setMinPriceDollars(Math.min(v, maxPriceDollars))
         }}
-        className="w-full accent-[#1877F2]"
+        className="w-full accent-[#e8a838]"
       />
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">Max</span>
-        <span className="text-xs font-semibold text-[#1877F2]">
+        <span style={{ fontSize: '0.75rem', color: '#9a8c7a' }}>Max</span>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#b07d10' }}>
           {maxPriceDollars >= PRICE_MAX ? `$${PRICE_MAX.toLocaleString()}+` : `$${maxPriceDollars.toLocaleString()}`}/mo
         </span>
       </div>
@@ -169,9 +199,9 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
           const v = Number(e.target.value)
           setMaxPriceDollars(Math.max(v, minPriceDollars))
         }}
-        className="w-full accent-[#1877F2]"
+        className="w-full accent-[#e8a838]"
       />
-      <div className="flex justify-between text-xs text-gray-400">
+      <div className="flex justify-between" style={{ fontSize: '0.75rem', color: '#9a8c7a' }}>
         <span>$0</span>
         <span>${PRICE_MAX.toLocaleString()}+</span>
       </div>
@@ -183,29 +213,25 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
       <button
         onClick={handleNearMe}
         disabled={geoLoading}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-wait disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-wait disabled:opacity-50"
+        style={{ border: '1px solid #e5ddd0', color: '#6b5e4e', background: 'transparent' }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(232,168,56,0.1)')}
+        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
       >
-        <svg
-          className="h-4 w-4 text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-          aria-hidden
-        >
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden style={{ color: '#b07d10' }}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
         {geoLoading ? 'Locating…' : userLocation ? 'Update location' : 'Near me'}
       </button>
 
-      {geoError && <p className="text-xs text-red-600">{geoError}</p>}
+      {geoError && <p style={{ fontSize: '0.75rem', color: '#c0392b' }}>{geoError}</p>}
 
       {userLocation && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">Radius</span>
-            <span className="text-xs font-semibold text-[#1877F2]">{radiusMiles} mi</span>
+            <span style={{ fontSize: '0.75rem', color: '#9a8c7a' }}>Radius</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#b07d10' }}>{radiusMiles} mi</span>
           </div>
           <input
             type="range"
@@ -214,15 +240,17 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
             step={1}
             value={radiusMiles}
             onChange={(e) => setRadiusMiles(Number(e.target.value))}
-            className="w-full accent-[#1877F2]"
+            className="w-full accent-[#e8a838]"
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between" style={{ fontSize: '0.75rem', color: '#9a8c7a' }}>
             <span>1 mi</span>
             <span>100 mi</span>
           </div>
           <button
             onClick={clearLocation}
-            className="text-xs text-gray-400 hover:text-gray-600 hover:underline"
+            style={{ fontSize: '0.75rem', color: '#9a8c7a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#b07d10')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#9a8c7a')}
           >
             Clear location filter
           </button>
@@ -234,7 +262,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   const campaignDatesSection = (
     <div className="space-y-2">
       <div>
-        <label className="mb-1 block text-xs text-gray-400">Start date</label>
+        <label style={{ display: 'block', marginBottom: '0.35rem', fontSize: '0.7rem', color: '#9a8c7a' }}>Start date</label>
         <input
           type="date"
           value={startDate}
@@ -243,28 +271,30 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
             setStartDate(e.target.value)
             if (endDate && e.target.value > endDate) setEndDate('')
           }}
-          className="w-full rounded-lg border border-gray-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+          style={sidebarInputStyle}
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-gray-400">End date</label>
+        <label style={{ display: 'block', marginBottom: '0.35rem', fontSize: '0.7rem', color: '#9a8c7a' }}>End date</label>
         <input
           type="date"
           value={endDate}
           min={startDate || today}
           onChange={(e) => setEndDate(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+          style={sidebarInputStyle}
         />
       </div>
       {startDate && endDate && (
-        <p className="text-xs font-semibold text-[#1877F2]">
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#b07d10' }}>
           {startDate} → {endDate}
         </p>
       )}
       {(startDate || endDate) && (
         <button
           onClick={() => { setStartDate(''); setEndDate('') }}
-          className="text-xs text-gray-400 hover:text-gray-600 hover:underline"
+          style={{ fontSize: '0.75rem', color: '#9a8c7a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#b07d10')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = '#9a8c7a')}
         >
           Clear dates
         </button>
@@ -274,21 +304,30 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex w-full h-[calc(100vh-56px)] overflow-hidden bg-white">
+    <div
+      className="flex h-[calc(100vh-56px)] overflow-hidden"
+      style={{ background: 'var(--bg)' }}
+    >
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden md:flex w-64 shrink-0 flex-col bg-white border-r border-gray-200 overflow-hidden">
-        <div className="flex-none p-4">
-          <h1 className="text-xl font-bold text-gray-900">Marketplace</h1>
+      <aside
+        className="hidden md:flex w-60 shrink-0 flex-col overflow-hidden"
+        style={{ background: '#fff', borderRight: '1px solid #e5e0d5' }}
+      >
+        <div className="flex-none px-5 py-4" style={{ background: '#e8a838', borderBottom: '1px solid #d4922a' }}>
+          <h1
+            className="font-display"
+            style={{ fontSize: '1.35rem', color: '#0d1117', letterSpacing: '-0.01em' }}
+          >
+            Marketplace
+          </h1>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-3 space-y-5">
+        <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
 
           {/* City search */}
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
-              City
-            </label>
+            <p style={sectionLabel}>City</p>
             <form method="GET" action="/spaces" className="flex gap-1.5">
               {searchParams.type && <input type="hidden" name="type" value={searchParams.type} />}
               {searchParams.q    && <input type="hidden" name="q"    value={searchParams.q}    />}
@@ -297,14 +336,15 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
                 type="text"
                 defaultValue={searchParams.city ?? ''}
                 placeholder="e.g. Chicago"
-                className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-[#f0f2f5] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+                style={{ ...sidebarInputStyle, flex: 1, minWidth: 0 }}
               />
               <button
                 type="submit"
                 aria-label="Search city"
-                className="shrink-0 rounded-lg bg-[#1877F2] px-3 py-2 text-white transition-colors hover:bg-blue-700"
+                className="shrink-0 rounded-lg px-3 py-2 transition-opacity hover:opacity-80"
+                style={{ background: 'var(--accent)', color: '#0d1117' }}
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
                 </svg>
               </button>
@@ -313,15 +353,15 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
           {/* Space type */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Space type
-            </p>
+            <p style={sectionLabel}>Space type</p>
             <div className="flex flex-col gap-0.5">
               <a
                 href={allTypesUrl}
-                className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                  !searchParams.type ? 'bg-blue-50 text-[#1877F2]' : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+                style={{
+                  background: !searchParams.type ? '#e8a838' : 'transparent',
+                  color: !searchParams.type ? '#0d1117' : '#6b5e4e',
+                }}
               >
                 All types
               </a>
@@ -329,11 +369,11 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
                 <a
                   key={t}
                   href={buildUrl({ city: searchParams.city, q: searchParams.q, type: t })}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                    searchParams.type === t
-                      ? 'bg-blue-50 text-[#1877F2]'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+                  style={{
+                    background: searchParams.type === t ? '#e8a838' : 'transparent',
+                    color: searchParams.type === t ? '#0d1117' : '#6b5e4e',
+                  }}
                 >
                   {t}
                 </a>
@@ -342,26 +382,20 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
           </div>
 
           {/* Price range */}
-          <div className="border-t border-gray-200 pt-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Price range
-            </p>
+          <div style={{ borderTop: '1px solid #e5ddd0', paddingTop: '1rem' }}>
+            <p style={sectionLabel}>Price range</p>
             {priceRangeSection}
           </div>
 
           {/* Proximity */}
-          <div className="border-t border-gray-200 pt-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Proximity
-            </p>
+          <div style={{ borderTop: '1px solid #e5ddd0', paddingTop: '1rem' }}>
+            <p style={sectionLabel}>Proximity</p>
             {proximitySection}
           </div>
 
           {/* Campaign dates */}
-          <div className="border-t border-gray-200 pt-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Campaign dates
-            </p>
+          <div style={{ borderTop: '1px solid #e5ddd0', paddingTop: '1rem' }}>
+            <p style={sectionLabel}>Campaign dates</p>
             {campaignDatesSection}
           </div>
 
@@ -370,15 +404,19 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
       {/* ── Card list column ── */}
       <div
-        className={`flex flex-col bg-white border-r border-gray-200 overflow-hidden w-full md:w-80 md:shrink-0 ${
+        className={`flex flex-col overflow-hidden w-full md:w-[28rem] md:shrink-0 ${
           mobileView === 'map' ? 'hidden md:flex' : 'flex'
         }`}
+        style={{ background: '#fff', borderRight: '1px solid #e5e0d5' }}
       >
         {/* Header bar */}
-        <div className="flex-none bg-white px-4 py-3">
+        <div
+          className="flex-none px-4 py-3"
+          style={{ borderBottom: '1px solid #e5e0d5' }}
+        >
           <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              <span className="font-semibold text-gray-900">{filteredSpaces.length}</span>{' '}
+            <p style={{ fontSize: '0.8125rem', color: '#9a8c7a' }}>
+              <span style={{ fontWeight: 600, color: '#1a1208' }}>{filteredSpaces.length}</span>{' '}
               {filteredSpaces.length === 1 ? 'listing' : 'listings'}
               {searchParams.type ? ` · ${searchParams.type}` : ''}
               {searchParams.city ? ` in ${searchParams.city}` : ''}
@@ -388,24 +426,38 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
             <div className="flex items-center gap-2 md:hidden">
               <button
                 onClick={() => setShowMobileFilters((v) => !v)}
-                className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                  showMobileFilters || userLocation || minPriceDollars > 0 || maxPriceDollars < PRICE_MAX
-                    ? 'border-[#1877F2] text-[#1877F2]'
-                    : 'border-gray-300 text-gray-600'
-                }`}
+                className="rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  borderColor: showMobileFilters || userLocation || minPriceDollars > 0 || maxPriceDollars < PRICE_MAX
+                    ? '#e8a838' : '#e5ddd0',
+                  color: showMobileFilters || userLocation || minPriceDollars > 0 || maxPriceDollars < PRICE_MAX
+                    ? '#b07d10' : '#6b5e4e',
+                  background: 'transparent',
+                }}
               >
                 Filters
               </button>
-              <div className="flex overflow-hidden rounded-lg border border-gray-300">
+              <div
+                className="flex overflow-hidden rounded-lg border"
+                style={{ borderColor: '#e5ddd0' }}
+              >
                 <button
                   onClick={() => setMobileView('list')}
-                  className={`px-3 py-1.5 text-xs font-medium ${mobileView === 'list' ? 'bg-[#1877F2] text-white' : 'text-gray-600'}`}
+                  className="px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    background: mobileView === 'list' ? '#e8a838' : 'transparent',
+                    color: mobileView === 'list' ? '#0d1117' : '#6b5e4e',
+                  }}
                 >
                   List
                 </button>
                 <button
                   onClick={() => setMobileView('map')}
-                  className={`px-3 py-1.5 text-xs font-medium ${mobileView === 'map' ? 'bg-[#1877F2] text-white' : 'text-gray-600'}`}
+                  className="px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    background: mobileView === 'map' ? '#e8a838' : 'transparent',
+                    color: mobileView === 'map' ? '#0d1117' : '#6b5e4e',
+                  }}
                 >
                   Map
                 </button>
@@ -415,7 +467,10 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
           {/* Mobile filters (collapsible) */}
           {showMobileFilters && (
-            <div className="mt-3 space-y-4 border-t border-gray-200 pt-3 md:hidden">
+            <div
+              className="mt-3 space-y-4 pt-3 md:hidden"
+              style={{ borderTop: '1px solid #e5ddd0' }}
+            >
               {/* City */}
               <form method="GET" action="/spaces" className="flex gap-1.5">
                 {searchParams.type && <input type="hidden" name="type" value={searchParams.type} />}
@@ -425,57 +480,61 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
                   type="text"
                   defaultValue={searchParams.city ?? ''}
                   placeholder="Search city…"
-                  className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-[#f0f2f5] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+                  style={{ ...sidebarInputStyle, flex: 1, minWidth: 0 }}
                 />
-                <button type="submit" aria-label="Search city" className="shrink-0 rounded-lg bg-[#1877F2] px-3 py-2 text-white">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
+                <button
+                  type="submit"
+                  aria-label="Search city"
+                  className="shrink-0 rounded-lg px-3 py-2 transition-opacity hover:opacity-80"
+                  style={{ background: '#e8a838', color: '#0d1117' }}
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
                   </svg>
                 </button>
               </form>
-              {/* Price range */}
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Price range</p>
+                <p style={sectionLabel}>Price range</p>
                 {priceRangeSection}
               </div>
-              {/* Proximity */}
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Proximity</p>
+                <p style={sectionLabel}>Proximity</p>
                 {proximitySection}
               </div>
-              {/* Campaign dates */}
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Campaign dates</p>
+                <p style={sectionLabel}>Campaign dates</p>
                 {campaignDatesSection}
               </div>
             </div>
           )}
         </div>
 
-        {/* Scrollable card list */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {/* Scrollable card grid */}
+        <div className="flex-1 overflow-y-auto p-4" style={{ background: '#faf7f2' }}>
           {filteredSpaces.length === 0 ? (
             <div className="flex flex-col items-center py-16 text-center">
-              <p className="text-lg font-semibold text-gray-900">No listings found</p>
-              <p className="mt-1 text-sm text-gray-500">
+              <p style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1a1208' }}>No listings found</p>
+              <p className="mt-1" style={{ fontSize: '0.875rem', color: '#9a8c7a' }}>
                 {userLocation
                   ? 'Try increasing the radius or clearing the location filter.'
                   : 'Try adjusting your filters.'}
               </p>
             </div>
           ) : (
-            filteredSpaces.map((space) => (
-              <div key={space.id} id={space.id}>
-                <SpaceCard
-                  space={space}
-                  isHighlighted={hoveredId === space.id}
-                  isFavorited={favorites.has(space.id)}
-                  onMouseEnter={() => setHoveredId(space.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  onToggleFavorite={() => toggleFavorite(space.id)}
-                />
-              </div>
-            ))
+            <div className="grid grid-cols-2 gap-3">
+              {filteredSpaces.map((space) => (
+                <div key={space.id} id={space.id}>
+                  <SpaceCard
+                    space={space}
+                    isHighlighted={hoveredId === space.id}
+                    isFavorited={favorites.has(space.id)}
+                    onMouseEnter={() => setHoveredId(space.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    onToggleFavorite={() => toggleFavorite(space.id)}
+                  />
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>

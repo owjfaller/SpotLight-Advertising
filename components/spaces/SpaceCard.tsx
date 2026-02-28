@@ -43,8 +43,8 @@ export default function SpaceCard({
   const [imgError, setImgError] = useState(false)
 
   const color = typeColors[space.space_type] ?? '#1a2130'
-  const emoji = typeEmojis[space.space_type] ?? '📍'
-  const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/600/400`
+  const imageUrl = (space as any).image_url ?? null
+  const hasImage = imageUrl && !imgError
 
   return (
     <Link
@@ -57,11 +57,11 @@ export default function SpaceCard({
       <div
         className="relative aspect-[4/3] w-full rounded-xl overflow-hidden flex items-center justify-center transition-all duration-200 group-hover:shadow-lg"
         style={{
-          background: color,
+          background: hasImage ? color : '#2a2f3a',
           boxShadow: isHighlighted ? `0 0 0 2px var(--accent)` : undefined,
         }}
       >
-        {!imgError && (
+        {hasImage && (
           <img
             src={imageUrl}
             alt={space.title}
@@ -71,9 +71,7 @@ export default function SpaceCard({
           />
         )}
 
-        {imgError && <span className="text-5xl">{emoji}</span>}
-
-        {!imgError && (
+        {hasImage && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         )}
 
