@@ -24,12 +24,12 @@ const typeColors: Record<string, string> = {
 }
 
 const typePhotoUrl: Record<string, string> = {
-  Billboard: 'https://loremflickr.com/400/300/billboard,signage?lock=1',
-  Vehicle:   'https://loremflickr.com/400/300/truck,van,wrapped?lock=2',
-  Indoor:    'https://loremflickr.com/400/300/interior,venue,hall?lock=3',
-  Outdoor:   'https://loremflickr.com/400/300/mural,rooftop,wall?lock=4',
-  Digital:   'https://loremflickr.com/400/300/led,screen,display?lock=5',
-  Event:     'https://loremflickr.com/400/300/market,booth,fair?lock=6',
+  Billboard: 'https://loremflickr.com/400/300/billboard?lock=21',
+  Vehicle:   'https://loremflickr.com/400/300/delivery-truck?lock=22',
+  Indoor:    'https://loremflickr.com/400/300/shopping-mall?lock=23',
+  Outdoor:   'https://loremflickr.com/400/300/street-art?lock=24',
+  Digital:   'https://loremflickr.com/400/300/times-square?lock=25',
+  Event:     'https://loremflickr.com/400/300/farmers-market?lock=26',
 }
 
 
