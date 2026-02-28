@@ -23,6 +23,15 @@ const typeColors: Record<string, string> = {
   Event:     '#2e0f2a',
 }
 
+const typePhotoKeywords: Record<string, string> = {
+  Billboard: 'billboard,signage,outdoor-advertising',
+  Vehicle:   'delivery-van,truck,vehicle-wrap',
+  Indoor:    'indoor-venue,interior,station',
+  Outdoor:   'mural,rooftop,outdoor-wall',
+  Digital:   'led-screen,digital-display,neon',
+  Event:     'market-booth,event-tent,fair',
+}
+
 
 export default function SpaceCard({
   space,
@@ -36,7 +45,8 @@ export default function SpaceCard({
 
   const color = typeColors[space.space_type] ?? '#1a2130'
   const uploadedUrl = (space as any).image_url ?? null
-  const placeholderUrl = `https://picsum.photos/seed/${space.id}/400/300`
+  const keywords = typePhotoKeywords[space.space_type] ?? 'advertising'
+  const placeholderUrl = `https://source.unsplash.com/400x300/?${keywords}&sig=${space.id}`
   const imageUrl = (!imgError && uploadedUrl) ? uploadedUrl : placeholderUrl
 
   return (
@@ -113,7 +123,7 @@ export default function SpaceCard({
       <div className="mt-2 px-0.5">
         <p
           className="text-sm font-medium line-clamp-1 transition-colors group-hover:opacity-80"
-          style={{ color: 'var(--text)' }}
+          style={{ color: '#1a1a1a' }}
         >
           {space.title}
         </p>
