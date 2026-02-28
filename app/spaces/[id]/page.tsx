@@ -7,7 +7,6 @@ import { api } from '@/lib/services/api'
 import { AdSpace } from '@/lib/types/database.types'
 import { formatPrice } from '@/lib/utils/formatters'
 import ContactBlock from '@/components/spaces/ContactBlock'
-import InterestedButton from '@/components/spaces/InterestedButton'
 import ReviewsSection from '@/components/spaces/ReviewsSection'
 
 interface SpaceDetailPageProps {
@@ -184,7 +183,6 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
                   <span className="text-sm font-normal text-gray-500">/mo</span>
                 </p>
               </div>
-              <InterestedButton spaceId={space.id} />
               <ContactBlock
                 spaceId={space.id}
                 listingTitle={space.title}
