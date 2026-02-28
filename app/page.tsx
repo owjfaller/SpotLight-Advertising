@@ -72,13 +72,22 @@ export default function HomePage() {
             >
               Browse spaces
             </Link>
-            <Link
-              href="/signup"
-              className="rounded-lg border px-8 py-3.5 text-sm font-semibold transition hover:bg-white/5"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-            >
-              List your space
-            </Link>
+            <div className="flex flex-col items-center gap-2">
+              <Link
+                href="/signup"
+                className="rounded-lg border px-8 py-3.5 text-sm font-semibold transition hover:bg-white/5"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
+                List your space
+              </Link>
+              <Link
+                href="/spaces/new"
+                className="text-xs transition hover:underline"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                Continue without logging in
+              </Link>
+            </div>
           </div>
 
           <p className="mt-6 text-xs" style={{ color: 'var(--text-faint)' }}>
@@ -163,13 +172,22 @@ export default function HomePage() {
             <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               List it free and start earning from your idle surfaces. No fees until you close.
             </p>
-            <Link
-              href="/signup"
-              className="mt-6 inline-block rounded-lg px-6 py-3 text-sm font-semibold transition hover:scale-[1.02]"
-              style={{ background: 'var(--accent)', color: '#0d1117' }}
-            >
-              List a space
-            </Link>
+            <div className="mt-6 flex flex-col gap-2">
+              <Link
+                href="/signup"
+                className="inline-block rounded-lg px-6 py-3 text-sm font-semibold transition hover:scale-[1.02]"
+                style={{ background: 'var(--accent)', color: '#0d1117' }}
+              >
+                List a space
+              </Link>
+              <Link
+                href="/spaces/new"
+                className="text-xs transition hover:underline"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                Continue without logging in
+              </Link>
+            </div>
           </div>
 
           <div
