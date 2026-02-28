@@ -1,6 +1,7 @@
 import { createClient } from '../supabase/server'
 import { createUUID } from '../utils/uuid'
 import { getCoordinates } from '../utils/geocode'
+import { haversineDistance } from '../utils/haversine'
 
 export type SpaceType = 'Billboard' | 'Vehicle' | 'Indoor' | 'Outdoor' | 'Digital' | 'Event' | 'Other'
 
@@ -18,12 +19,23 @@ export interface AddListingParams {
   type: SpaceType
 }
 
+export interface ListingFilters {
+  low_price?: number;
+  high_price?: number;
+  type?: SpaceType;
+  radius?: number;
+  user_lat?: number;
+  user_lng?: number;
+  start_date?: string;
+  end_date?: string;
+}
+
 export async function addListing(
   params: AddListingParams
 ): Promise<{ id: string | null; error: string | null }> {
   const { title, username, location, duration, price, type } = params
 
-  const id = createUUID(title)
+  const id = createUUID()
   const coords = await getCoordinates(location)
 
   const supabase = createClient()
@@ -65,3 +77,56 @@ export async function getListingByTitleAndOwner(
   if (error) return { id: null, error: error.message }
   return { id: data.id, error: null }
 }
+
+export async function getFilteredListings(
+  filters: ListingFilters
+): Promise<{ data: any[] | null; error: string | null }> {
+  const supabase = createClient()
+  let query = supabase.from('listings').select('*')
+
+  // Price "between" logic: defaults low_price to 0 if not provided
+  const lowPrice = filters.low_price ?? 0
+  query = query.gte('price_cents', Math.round(lowPrice * 100))
+
+  if (filters.high_price !== undefined && filters.high_price !== null) {
+    query = query.lte('price_cents', Math.round(filters.high_price * 100))
+  }
+
+  if (filters.type) {
+    query = query.eq('type', filters.type)
+  }
+
+  // Date filtering logic as requested:
+  // "start date being any date equal to or less than the start date"
+  if (filters.start_date) {
+    query = query.lte('start_date', filters.start_date)
+  }
+  // "end date being anything earlier or equal to the given end date"
+  if (filters.end_date) {
+    query = query.gte('end_date', filters.end_date)
+  }
+
+  const { data, error } = await query
+
+  if (error) return { data: null, error: error.message }
+  if (!data) return { data: [], error: null }
+
+  let results = data
+
+  // Handle radius filter in TypeScript
+  if (filters.radius && filters.user_lat !== undefined && filters.user_lng !== undefined) {
+    results = data.filter((listing) => {
+      if (listing.lat === null || listing.lng === null) return false
+      const distance = haversineDistance(
+        filters.user_lat!,
+        filters.user_lng!,
+        listing.lat,
+        listing.lng
+      )
+      return distance <= filters.radius!
+    })
+  }
+
+  return { data: results, error: null }
+}
+
