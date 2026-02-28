@@ -23,7 +23,7 @@ CREATE TABLE users (
 );
 
 -- ============================================================
--- LISTINGS
+-- AD SPACES
 -- ============================================================
 CREATE TABLE ad_spaces (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -36,18 +36,20 @@ CREATE TABLE ad_spaces (
   location_address TEXT,
   lat              FLOAT8,
   lng              FLOAT8,
+  about            TEXT,
+  photo_url        TEXT,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Prevent the same owner from having two listings with the same title
-ALTER TABLE listings ADD CONSTRAINT unique_title_per_owner UNIQUE (title, owner);
+-- Prevent the same owner from having two ad spaces with the same title
+ALTER TABLE ad_spaces ADD CONSTRAINT unique_title_per_owner UNIQUE (title, owner);
 
 -- ============================================================
--- LISTING BUYERS  (many-to-many: listings <-> users)
+-- AD SPACE BUYERS  (many-to-many: ad_spaces <-> users)
 -- ============================================================
-CREATE TABLE listing_buyers (
-  listing_id  UUID NOT NULL REFERENCES ad_spaces(id) ON DELETE CASCADE,
+CREATE TABLE ad_space_buyers (
+  ad_space_id  UUID NOT NULL REFERENCES ad_spaces(id) ON DELETE CASCADE,
   username    TEXT NOT NULL REFERENCES users(username) ON DELETE CASCADE,
   added_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (listing_id, username)
+  PRIMARY KEY (ad_space_id, username)
 );

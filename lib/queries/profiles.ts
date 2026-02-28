@@ -41,14 +41,14 @@ export async function getUserInfo(username: string): Promise<{
 
   if (pubError) return { published: null, rentingTo: null, error: pubError.message }
 
-  // 2. Get renters (listing_buyers) who are "renting" or interested in those listings
-  // We use listings!inner to join and filter by the owner username
+  // 2. Get renters (ad_space_buyers) who are "renting" or interested in those ad spaces
+  // We use ad_spaces!inner to join and filter by the owner username
   const { data: rentingTo, error: rentError } = await supabase
-    .from('listing_buyers')
+    .from('ad_space_buyers')
     .select(`
       username,
       added_at,
-      listing_id,
+      ad_space_id,
       ad_spaces!inner (
         title
       )

@@ -17,6 +17,8 @@ export interface AddAdSpaceParams {
   duration: Duration
   price: number    // dollars (e.g. 1500 = $1,500)
   type: SpaceType
+  about?: string
+  photo_url?: string
 }
 
 export interface AdSpaceFilters {
@@ -33,7 +35,7 @@ export interface AdSpaceFilters {
 export async function addAdSpace(
   params: AddAdSpaceParams
 ): Promise<{ id: string | null; error: string | null }> {
-  const { title, username, location, duration, price, type } = params
+  const { title, username, location, duration, price, type, about, photo_url } = params
 
   const id = createUUID()
   const coords = await getCoordinates(location)
@@ -53,6 +55,8 @@ export async function addAdSpace(
       end_date: duration.end_date,
       price_cents: Math.round(price * 100),
       type,
+      about: about ?? null,
+      photo_url: photo_url ?? null,
     })
     .select('id')
     .single()
@@ -101,7 +105,7 @@ export async function getFilteredAdSpaces(
   if (filters.start_date) {
     query = query.lte('start_date', filters.start_date)
   }
-  // "end date being anything earlier or equal to the given end date"
+  // "end date being anything later or equal to the given end date"
   if (filters.end_date) {
     query = query.gte('end_date', filters.end_date)
   }
