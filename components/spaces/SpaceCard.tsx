@@ -37,8 +37,7 @@ export default function SpaceCard({
   const color = typeColors[space.space_type] ?? '#1a2130'
   const uploadedUrl = (space as any).image_url ?? null
   const placeholderUrl = `https://picsum.photos/seed/${space.id}/400/300`
-  const imageUrl = uploadedUrl ?? placeholderUrl
-  const hasImage = imageUrl && !imgError
+  const imageUrl = (!imgError && uploadedUrl) ? uploadedUrl : placeholderUrl
 
   return (
     <Link
