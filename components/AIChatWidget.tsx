@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { MOCK_SPACES } from '@/lib/mock/spaces'
+import { MOCK_SPACES, MOCK_EXTRAS } from '@/lib/mock/spaces'
 import { formatPrice } from '@/lib/utils/formatters'
 
 interface Message {
@@ -25,83 +25,73 @@ const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   Event:     { bg: '#fce7f3', text: '#be185d' },
 }
 
-// ── Parse assistant response into display text + picked listing IDs ──────────
-function parseResponse(content: string): { text: string; pickedIds: string[] } {
-  const picksMatch = content.split(/PICKS:/i)
-  if (picksMatch.length < 2) {
-    return { text: content.trim(), pickedIds: [] }
+// ── Robust parser: scan the PICKS section for any known title substring ──────
+function parseResponse(raw: string): { text: string; pickedIds: string[] } {
+  const picksIdx = raw.search(/PICKS:/i)
+  if (picksIdx === -1) return { text: raw.trim(), pickedIds: [] }
+
+  const textPart = raw.slice(0, picksIdx).trim()
+  const afterPicks = raw.slice(picksIdx + 6) // skip "PICKS:"
+
+  // Scan the entire afterPicks string for any known listing title
+  const pickedIds: string[] = []
+  for (const space of MOCK_SPACES) {
+    if (afterPicks.toLowerCase().includes(space.title.toLowerCase())) {
+      if (!pickedIds.includes(space.id)) pickedIds.push(space.id)
+    }
   }
-
-  const textPart = picksMatch[0].trim()
-  const picksPart = picksMatch[1]
-
-  // Each line in picks section is a listing title
-  const pickedIds = picksPart
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((title) => {
-      const match = MOCK_SPACES.find(
-        (s) => s.title.toLowerCase() === title.toLowerCase()
-      )
-      return match?.id ?? null
-    })
-    .filter((id): id is string => id !== null)
 
   return { text: textPart, pickedIds }
 }
 
-// ── Listing card ─────────────────────────────────────────────────────────────
+// ── Rich listing card ────────────────────────────────────────────────────────
 function ListingCard({ spaceId }: { spaceId: string }) {
   const space = MOCK_SPACES.find((s) => s.id === spaceId)
+  const extra = MOCK_EXTRAS[spaceId]
   if (!space) return null
 
   const color = TYPE_COLORS[space.space_type] ?? { bg: '#f3f4f6', text: '#374151' }
-  const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/120/80`
+  const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/160/120`
 
   return (
     <Link
       href={`/spaces/${space.id}`}
-      className="group flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:border-[#e8a838] hover:shadow-md"
+      className="group flex overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all hover:border-[#e8a838] hover:shadow-md"
     >
-      {/* Thumbnail */}
+      {/* Left: info */}
+      <div className="flex flex-1 flex-col gap-1 p-3">
+        <span
+          className="inline-flex w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold"
+          style={{ background: color.bg, color: color.text }}
+        >
+          {space.space_type}
+        </span>
+        <p className="text-xs font-bold leading-tight text-gray-900 group-hover:text-[#c47f10]">
+          {space.title}
+        </p>
+        <p className="text-[11px] text-gray-400">{space.city}</p>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-bold text-[#e8a838]">
+            {formatPrice(space.price_cents)}
+            <span className="text-[10px] font-normal text-gray-400">/mo</span>
+          </span>
+          {extra && (
+            <span className="rounded-full bg-green-50 px-1.5 py-0.5 text-[10px] font-medium text-green-600">
+              {extra.availability}
+            </span>
+          )}
+        </div>
+        <span className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold text-[#e8a838] group-hover:underline">
+          View listing →
+        </span>
+      </div>
+      {/* Right: image */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt={space.title}
-        className="h-14 w-14 shrink-0 rounded-xl object-cover"
+        className="h-auto w-24 shrink-0 object-cover"
       />
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-semibold text-gray-900 group-hover:text-[#c47f10]">
-          {space.title}
-        </p>
-        <p className="mt-0.5 text-xs text-gray-400">{space.city}</p>
-        <div className="mt-1 flex items-center gap-1.5">
-          <span
-            className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
-            style={{ background: color.bg, color: color.text }}
-          >
-            {space.space_type}
-          </span>
-          <span className="text-xs font-semibold text-[#e8a838]">
-            {formatPrice(space.price_cents)}/mo
-          </span>
-        </div>
-      </div>
-      {/* Arrow */}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="h-4 w-4 shrink-0 text-gray-300 transition-colors group-hover:text-[#e8a838]"
-      >
-        <path
-          fillRule="evenodd"
-          d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
-          clipRule="evenodd"
-        />
-      </svg>
     </Link>
   )
 }
@@ -150,7 +140,6 @@ export default function AIChatWidget() {
 
   async function sendMessage(text: string) {
     if (!text.trim() || streaming) return
-
     const userMessage: Message = { role: 'user', content: text.trim() }
     const newMessages = [...messages, userMessage]
     setMessages(newMessages)
@@ -166,12 +155,9 @@ export default function AIChatWidget() {
           messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
         }),
       })
-
       if (!res.ok || !res.body) throw new Error('Request failed')
-
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
-
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
@@ -188,10 +174,7 @@ export default function AIChatWidget() {
     } catch {
       setMessages((prev) => {
         const updated = [...prev]
-        updated[updated.length - 1] = {
-          ...updated[updated.length - 1],
-          content: 'Something went wrong. Please try again.',
-        }
+        updated[updated.length - 1] = { ...updated[updated.length - 1], content: 'Something went wrong. Please try again.' }
         return updated
       })
     } finally {
@@ -200,21 +183,16 @@ export default function AIChatWidget() {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage(input)
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input) }
   }
 
-  const showStarters = messages.length === 0
-
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+
+      {/* ── Chat panel ── */}
       {open && (
-        <div
-          className="flex w-80 flex-col overflow-hidden rounded-2xl shadow-2xl"
-          style={{ height: 520, background: '#fff', border: '1px solid #e5e7eb' }}
-        >
+        <div style={{ width: '360px', height: '520px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: '16px', border: '1px solid #e5e7eb', background: '#fff', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+
           {/* Header */}
           <div className="flex shrink-0 items-center justify-between px-4 py-3" style={{ background: '#0d1117' }}>
             <div className="flex items-center gap-2">
@@ -228,9 +206,9 @@ export default function AIChatWidget() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ background: '#faf7f2' }}>
-            {showStarters ? (
+            {messages.length === 0 ? (
               <div className="flex flex-col gap-2.5">
-                <p className="text-xs text-gray-500 text-center pt-1">
+                <p className="pt-1 text-center text-xs text-gray-500">
                   Tell me about your brand and I&apos;ll find the best ad spaces for you.
                 </p>
                 {STARTER_PROMPTS.map((prompt) => (
@@ -248,34 +226,33 @@ export default function AIChatWidget() {
                 if (msg.role === 'user') {
                   return (
                     <div key={i} className="flex justify-end">
-                      <div className="max-w-[85%] rounded-2xl bg-[#e8a838] px-3 py-2 text-xs text-white">
+                      <div className="max-w-[78%] rounded-2xl bg-[#e8a838] px-3 py-2 text-xs leading-relaxed text-white">
                         {msg.content}
                       </div>
                     </div>
                   )
                 }
 
-                // Assistant message
-                const isStreaming = streaming && i === messages.length - 1
+                const isCurrentlyStreaming = streaming && i === messages.length - 1
                 const { text, pickedIds } = parseResponse(msg.content)
 
                 return (
                   <div key={i} className="flex flex-col gap-2">
-                    {/* Text bubble */}
+                    {/* Text bubble — only the clean context text */}
                     <div className="rounded-2xl bg-white px-3 py-2.5 text-xs leading-relaxed text-gray-700 shadow-sm">
                       {msg.content === '' ? (
-                        <span className="inline-flex gap-1">
+                        <span className="inline-flex gap-1 text-gray-400">
                           <span className="animate-bounce" style={{ animationDelay: '0ms' }}>•</span>
                           <span className="animate-bounce" style={{ animationDelay: '150ms' }}>•</span>
                           <span className="animate-bounce" style={{ animationDelay: '300ms' }}>•</span>
                         </span>
                       ) : (
-                        text || msg.content
+                        text
                       )}
                     </div>
 
-                    {/* Listing cards — shown once streaming is done */}
-                    {!isStreaming && pickedIds.length > 0 && (
+                    {/* Listing cards — appear after streaming finishes */}
+                    {!isCurrentlyStreaming && pickedIds.length > 0 && (
                       <div className="space-y-2">
                         <p className="px-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                           Recommended spaces
@@ -308,7 +285,7 @@ export default function AIChatWidget() {
               <button
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || streaming}
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-colors disabled:opacity-40"
+                className="flex h-6 w-6 shrink-0 items-center justify-center transition-colors disabled:opacity-40"
                 style={{ color: '#e8a838' }}
               >
                 <SendIcon />
@@ -318,10 +295,10 @@ export default function AIChatWidget() {
         </div>
       )}
 
-      {/* Toggle button */}
+      {/* ── Toggle button ── */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-full px-4 py-3 font-semibold text-sm text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
         style={{ background: '#e8a838' }}
       >
         <SparkleIcon />

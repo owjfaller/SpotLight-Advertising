@@ -48,7 +48,7 @@ export default async function RentalsPage() {
         .eq('advertiser_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (!error && data) rentals = data as Rental[]
+      if (!error && data) rentals = data as unknown as Rental[]
       if (error) fetchError = true
     }
   } catch {
