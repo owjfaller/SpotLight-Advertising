@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { getSpaceById } from '@/lib/queries/spaces'
 import { formatPrice } from '@/lib/utils/formatters'
 import { MOCK_SPACES, MOCK_EXTRAS } from '@/lib/mock/spaces'
-import InterestedButton from '@/components/spaces/InterestedButton'
+import ContactBlock from '@/components/spaces/ContactBlock'
 
 interface SpaceDetailPageProps {
   params: { id: string }
@@ -25,17 +25,17 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
 
   const space = hasSupabase
     ? await getSpaceById(params.id)
-    : MOCK_SPACES.find((s) => s.id === params.id) ?? null
+    : (MOCK_SPACES.find((s) => s.id === params.id) ?? null)
 
   if (!space) notFound()
 
   const extras = MOCK_EXTRAS[space.id] ?? {
-    duration_min: 'Contact for details',
-    availability: 'Contact owner',
-    owner_name: 'Space Owner',
-    owner_since: '2024',
-    owner_response_rate: 'N/A',
-    owner_listings: 1,
+    duration_min:          'Contact for details',
+    availability:          'Contact owner',
+    owner_name:            'Space Owner',
+    owner_since:           '2024',
+    owner_response_rate:   'N/A',
+    owner_listings:        1,
   }
 
   const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/1200/600`
@@ -47,11 +47,7 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
       {/* ── Hero image ── */}
       <div className={`relative h-56 w-full overflow-hidden md:h-80 ${color}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={imageUrl}
-          alt={space.title}
-          className="h-full w-full object-cover"
-        />
+        <img src={imageUrl} alt={space.title} className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         <span className="absolute bottom-4 left-4 rounded-full bg-black/70 px-3 py-1 text-sm font-semibold text-white">
           {space.space_type}
@@ -79,7 +75,6 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
                 {formatPrice(space.price_cents)}
                 <span className="text-base font-normal text-gray-500">/mo</span>
               </p>
-              <p className="mt-1 text-sm text-gray-500">{extras.duration_min}</p>
             </div>
 
             {/* Location */}
@@ -90,19 +85,13 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
               <div className="flex items-start gap-3">
                 <svg
                   className="mt-0.5 h-5 w-5 shrink-0 text-[#1877F2]"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                  aria-hidden
+                  fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <div>
-                  {space.address && (
-                    <p className="font-medium text-gray-900">{space.address}</p>
-                  )}
+                  {space.address && <p className="font-medium text-gray-900">{space.address}</p>}
                   <p className="text-sm text-gray-500">{space.city}</p>
                 </div>
               </div>
@@ -158,25 +147,29 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
             </div>
           </div>
 
-          {/* ── Right column (sticky CTA) ── */}
+          {/* ── Right column (sticky) ── */}
           <div className="space-y-4 lg:w-80 lg:shrink-0">
 
-            {/* Price + CTA */}
-            <div className="rounded-xl bg-white p-6 shadow-sm">
-              <p className="text-2xl font-bold text-gray-900">
-                {formatPrice(space.price_cents)}
-                <span className="text-sm font-normal text-gray-500">/mo</span>
-              </p>
-              <p className="mt-0.5 text-xs text-gray-400">{extras.availability}</p>
-              <div className="mt-4 space-y-2">
-                <InterestedButton />
-                <Link
-                  href="/spaces"
-                  className="block w-full rounded-lg border border-gray-300 py-3 text-center text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
-                >
-                  Back to listings
-                </Link>
+            {/* Price + campaign dates + CTA */}
+            <div className="rounded-xl bg-white p-6 shadow-sm space-y-4">
+              <div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatPrice(space.price_cents)}
+                  <span className="text-sm font-normal text-gray-500">/mo</span>
+                </p>
               </div>
+              <ContactBlock
+                listingTitle={space.title}
+                ownerName={extras.owner_name}
+                minDuration={extras.duration_min}
+                availability={extras.availability}
+              />
+              <Link
+                href="/spaces"
+                className="block w-full rounded-lg border border-gray-300 py-3 text-center text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                Back to listings
+              </Link>
             </div>
 
             {/* Owner card */}
@@ -193,19 +186,14 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
                   <p className="text-xs text-gray-400">Member since {extras.owner_since}</p>
                 </div>
               </div>
-
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-gray-50 p-3 text-center">
                   <p className="text-xs text-gray-400">Response rate</p>
-                  <p className="mt-1 text-lg font-bold text-gray-900">
-                    {extras.owner_response_rate}
-                  </p>
+                  <p className="mt-1 text-lg font-bold text-gray-900">{extras.owner_response_rate}</p>
                 </div>
                 <div className="rounded-lg bg-gray-50 p-3 text-center">
                   <p className="text-xs text-gray-400">Listings</p>
-                  <p className="mt-1 text-lg font-bold text-gray-900">
-                    {extras.owner_listings}
-                  </p>
+                  <p className="mt-1 text-lg font-bold text-gray-900">{extras.owner_listings}</p>
                 </div>
               </div>
             </div>
