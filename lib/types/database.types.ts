@@ -1,3 +1,6 @@
+export type SpaceType = 'Billboard' | 'Vehicle' | 'Indoor' | 'Outdoor' | 'Digital' | 'Event' | 'Other'
+export type AdSpaceStatus = 'draft' | 'published' | 'archived'
+
 export interface Profile {
   id: string
   email: string | null
@@ -14,13 +17,16 @@ export interface AdSpace {
   owner_id: string
   title: string
   description: string | null
-  space_type: string
-  status: 'draft' | 'published' | 'archived'
+  space_type: SpaceType
+  status: AdSpaceStatus
   price_cents: number
-  city: string
+  city: string | null
   address: string | null
   lat: number | null
   lng: number | null
+  image_url: string | null
+  start_date: string | null
+  end_date: string | null
   created_at: string
   updated_at: string
 }
@@ -28,9 +34,15 @@ export interface AdSpace {
 export interface AdSpaceMapMarker {
   id: string
   title: string
-  space_type: string
+  space_type: SpaceType
   price_cents: number
-  city: string
+  city: string | null
   lat: number
   lng: number
+}
+
+export interface AdSpaceInterest {
+  ad_space_id: string
+  user_id: string
+  created_at: string
 }

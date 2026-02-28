@@ -5,6 +5,12 @@ import { getCoordinates } from '@/lib/utils/geocode'
 export async function POST(request: NextRequest) {
   const supabase = createClient()
 
+  // Get current user session
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const body = await request.json()
   const { title, type, location, city, start_date, end_date, price, description, image_url } = body
 
@@ -18,9 +24,9 @@ export async function POST(request: NextRequest) {
     .from('ad_spaces')
     .insert({
       title,
-      owner: null,
+      owner_id: user.id,
       space_type: type,
-      location_address: location,
+      address: location,
       city,
       lat: coords?.lat ?? null,
       lng: coords?.lng ?? null,
@@ -29,6 +35,7 @@ export async function POST(request: NextRequest) {
       price_cents: Math.round(Number(price) * 100),
       description: description || null,
       image_url: image_url || null,
+      status: 'published'
     })
     .select('id')
     .single()

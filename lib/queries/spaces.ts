@@ -21,8 +21,10 @@ export async function getSpaces(options: GetSpacesOptions = {}): Promise<GetSpac
     .eq('status', 'published')
     .order('created_at', { ascending: false })
 
+  // Search logic
   if (options.q) {
-    query = query.textSearch('fts', options.q, { type: 'websearch' })
+    // Basic text search on title and description
+    query = query.or(`title.ilike.%${options.q}%,description.ilike.%${options.q}%`)
   }
 
   if (options.type) {

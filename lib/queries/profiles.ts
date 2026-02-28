@@ -26,9 +26,9 @@ export async function updateProfile(
   return { error: error?.message ?? null }
 }
 
-export async function getUserInfo(username: string): Promise<{
+export async function getUserInfo(userId: string): Promise<{
   published: any[] | null;
-  rentingTo: any[] | null;
+  interestedIn: any[] | null;
   error: string | null;
 }> {
   const supabase = createClient()
@@ -37,25 +37,24 @@ export async function getUserInfo(username: string): Promise<{
   const { data: published, error: pubError } = await supabase
     .from('ad_spaces')
     .select('*')
-    .eq('owner', username)
+    .eq('owner_id', userId)
 
-  if (pubError) return { published: null, rentingTo: null, error: pubError.message }
+  if (pubError) return { published: null, interestedIn: null, error: pubError.message }
 
-  // 2. Get renters (ad_space_buyers) who are "renting" or interested in those ad spaces
-  // We use ad_spaces!inner to join and filter by the owner username
-  const { data: rentingTo, error: rentError } = await supabase
-    .from('ad_space_buyers')
+  // 2. Get interests
+  const { data: interestedIn, error: intError } = await supabase
+    .from('ad_space_interests')
     .select(`
-      username,
-      added_at,
+      created_at,
       ad_space_id,
       ad_spaces!inner (
-        title
+        title,
+        owner_id
       )
     `)
-    .eq('ad_spaces.owner', username)
+    .eq('user_id', userId)
 
-  if (rentError) return { published, rentingTo: null, error: rentError.message }
+  if (intError) return { published, interestedIn: null, error: intError.message }
 
-  return { published, rentingTo, error: null }
+  return { published, interestedIn, error: null }
 }

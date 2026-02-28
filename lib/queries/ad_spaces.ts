@@ -1,25 +1,7 @@
 import { createClient } from '../supabase/server'
-import { createUUID } from '../utils/uuid'
+import { SpaceType } from '../types/database.types'
 import { getCoordinates } from '../utils/geocode'
 import { haversineDistance } from '../utils/haversine'
-
-export type SpaceType = 'Billboard' | 'Vehicle' | 'Indoor' | 'Outdoor' | 'Digital' | 'Event' | 'Other'
-
-export interface Duration {
-  start_date: string // YYYY-MM-DD
-  end_date: string   // YYYY-MM-DD
-}
-
-export interface AddAdSpaceParams {
-  title: string
-  username: string
-  location: string
-  duration: Duration
-  price: number    // dollars (e.g. 1500 = $1,500)
-  type: SpaceType
-  about?: string
-  photo_url?: string
-}
 
 export interface AdSpaceFilters {
   low_price?: number;
@@ -32,50 +14,41 @@ export interface AdSpaceFilters {
   end_date?: string;
 }
 
-export async function addAdSpace(
-  params: AddAdSpaceParams
-): Promise<{ id: string | null; error: string | null }> {
-  const { title, username, location, duration, price, type, about, photo_url } = params
+export async function addAdSpace(params: {
+  title: string
+  owner_id: string
+  address: string
+  city: string
+  start_date: string
+  end_date: string
+  price: number    // dollars
+  space_type: SpaceType
+  description?: string
+  image_url?: string
+}): Promise<{ id: string | null; error: string | null }> {
+  const { title, owner_id, address, city, start_date, end_date, price, space_type, description, image_url } = params
 
-  const id = createUUID()
-  const coords = await getCoordinates(location)
-
+  const coords = await getCoordinates(address)
   const supabase = createClient()
 
   const { data, error } = await supabase
     .from('ad_spaces')
     .insert({
-      id,
       title,
-      owner: username,
-      location_address: location,
+      owner_id,
+      address,
+      city,
       lat: coords?.lat ?? null,
       lng: coords?.lng ?? null,
-      start_date: duration.start_date,
-      end_date: duration.end_date,
+      start_date,
+      end_date,
       price_cents: Math.round(price * 100),
-      type,
-      about: about ?? null,
-      photo_url: photo_url ?? null,
+      space_type,
+      description: description ?? null,
+      image_url: image_url ?? null,
+      status: 'published'
     })
     .select('id')
-    .single()
-
-  if (error) return { id: null, error: error.message }
-  return { id: data.id, error: null }
-}
-
-export async function getAdSpaceByTitleAndOwner(
-  title: string,
-  username: string
-): Promise<{ id: string | null; error: string | null }> {
-  const supabase = createClient()
-
-  const { data, error } = await supabase
-    .from('ad_spaces')
-    .select('id')
-    .eq('title', title)
-    .eq('owner', username)
     .single()
 
   if (error) return { id: null, error: error.message }
@@ -86,9 +59,8 @@ export async function getFilteredAdSpaces(
   filters: AdSpaceFilters
 ): Promise<{ data: any[] | null; error: string | null }> {
   const supabase = createClient()
-  let query = supabase.from('ad_spaces').select('*')
+  let query = supabase.from('ad_spaces').select('*').eq('status', 'published')
 
-  // Price "between" logic: defaults low_price to 0 if not provided
   const lowPrice = filters.low_price ?? 0
   query = query.gte('price_cents', Math.round(lowPrice * 100))
 
@@ -97,15 +69,12 @@ export async function getFilteredAdSpaces(
   }
 
   if (filters.type) {
-    query = query.eq('type', filters.type)
+    query = query.eq('space_type', filters.type)
   }
 
-  // Date filtering logic as requested:
-  // "start date being any date equal to or less than the start date"
   if (filters.start_date) {
     query = query.lte('start_date', filters.start_date)
   }
-  // "end date being anything later or equal to the given end date"
   if (filters.end_date) {
     query = query.gte('end_date', filters.end_date)
   }
@@ -117,7 +86,6 @@ export async function getFilteredAdSpaces(
 
   let results = data
 
-  // Handle radius filter in TypeScript
   if (filters.radius && filters.user_lat !== undefined && filters.user_lng !== undefined) {
     results = data.filter((item) => {
       if (item.lat === null || item.lng === null) return false
