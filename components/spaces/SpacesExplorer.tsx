@@ -274,10 +274,10 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-[calc(100vh-56px)] overflow-hidden">
+    <div className="flex h-[calc(100vh-56px)] overflow-hidden bg-white">
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-gray-100 bg-white overflow-hidden">
+      <aside className="hidden md:flex w-64 shrink-0 flex-col bg-white overflow-hidden">
         <div className="flex-none border-b border-gray-200 p-4">
           <h1 className="text-xl font-bold text-gray-900">Marketplace</h1>
         </div>
@@ -370,12 +370,12 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
       {/* ── Card list column ── */}
       <div
-        className={`flex flex-col border-r border-gray-100 bg-white overflow-hidden w-full md:w-80 md:shrink-0 ${
+        className={`flex flex-col bg-white overflow-hidden w-full md:w-80 md:shrink-0 ${
           mobileView === 'map' ? 'hidden md:flex' : 'flex'
         }`}
       >
         {/* Header bar */}
-        <div className="flex-none border-b border-gray-100 bg-white px-4 py-3">
+        <div className="flex-none bg-white px-4 py-3">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-500">
               <span className="font-semibold text-gray-900">{filteredSpaces.length}</span>{' '}
