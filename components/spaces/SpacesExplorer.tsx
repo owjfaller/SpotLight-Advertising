@@ -278,7 +278,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
 
       {/* ── Desktop sidebar ── */}
       <aside className="hidden md:flex w-64 shrink-0 flex-col bg-white overflow-hidden">
-        <div className="flex-none border-b border-gray-200 p-4">
+        <div className="flex-none p-4">
           <h1 className="text-xl font-bold text-gray-900">Marketplace</h1>
         </div>
 

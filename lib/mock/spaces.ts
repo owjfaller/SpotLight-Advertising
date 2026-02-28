@@ -49,6 +49,30 @@ export const MOCK_SPACES: AdSpace[] = [
     city: 'Nashville', address: 'Centennial Park, Nashville, TN 37203',
     lat: 36.1627, lng: -86.7816,
   },
+  {
+    id: '7', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    title: 'Downtown SLC Billboard',
+    description: 'High-impact billboard on Main Street in the heart of Salt Lake City\'s business district. Visible to commuters on I-15 and thousands of daily pedestrians. Perfect for regional brand awareness campaigns.',
+    space_type: 'Billboard', price_cents: 55000,
+    city: 'Salt Lake City', address: '200 S Main St, Salt Lake City, UT 84101',
+    lat: 40.7608, lng: -111.891,
+  },
+  {
+    id: '8', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    title: 'Park City Mountain Kiosk',
+    description: 'Premium outdoor kiosk at the base of Park City Mountain Resort — one of the largest ski resorts in the US. Reach affluent skiers and snowboarders throughout the winter season, plus summer mountain bikers.',
+    space_type: 'Outdoor', price_cents: 48000,
+    city: 'Park City', address: 'Park City Mountain Resort, Park City, UT 84060',
+    lat: 40.6461, lng: -111.498,
+  },
+  {
+    id: '9', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    title: 'Provo Tech Hub Digital Screen',
+    description: 'Large-format digital screen inside the Provo Tech Hub co-working space, frequented by Utah Valley\'s fast-growing startup community. Ideal for B2B, SaaS, and recruiting campaigns.',
+    space_type: 'Digital', price_cents: 22000,
+    city: 'Provo', address: '252 N Freedom Blvd, Provo, UT 84601',
+    lat: 40.2338, lng: -111.6585,
+  },
 ]
 
 export const MOCK_MARKERS: AdSpaceMapMarker[] = MOCK_SPACES.map((s) => ({
@@ -118,5 +142,29 @@ export const MOCK_EXTRAS: Record<string, MockSpaceExtra> = {
     owner_since: 'Apr 2024',
     owner_response_rate: '93%',
     owner_listings: 3,
+  },
+  '7': {
+    duration_min: 'Min. 1 month',
+    availability: 'Available now',
+    owner_name: 'Nate Christiansen',
+    owner_since: 'Aug 2024',
+    owner_response_rate: '99%',
+    owner_listings: 2,
+  },
+  '8': {
+    duration_min: 'Min. 1 season (3 months)',
+    availability: 'Winter season open',
+    owner_name: 'Brooke Halverson',
+    owner_since: 'Oct 2024',
+    owner_response_rate: '97%',
+    owner_listings: 1,
+  },
+  '9': {
+    duration_min: 'Min. 2 weeks',
+    availability: 'Available now',
+    owner_name: 'Ryan Sorensen',
+    owner_since: 'Sep 2024',
+    owner_response_rate: '94%',
+    owner_listings: 2,
   },
 }
