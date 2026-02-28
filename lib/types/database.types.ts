@@ -46,3 +46,13 @@ export interface AdSpaceInterest {
   user_id: string
   created_at: string
 }
+
+export interface Review {
+  id: string
+  ad_space_id: string
+  reviewer_id: string
+  rating: number
+  title: string
+  body: string
+  created_at: string
+}

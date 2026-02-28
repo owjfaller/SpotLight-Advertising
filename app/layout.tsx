@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import { DM_Serif_Display, DM_Sans } from 'next/font/google'
+import dynamic from 'next/dynamic'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+
+const AIChatWidget = dynamic(() => import('@/components/AIChatWidget'), { ssr: false })
 
 const dmSerif = DM_Serif_Display({
   weight: ['400'],
@@ -35,6 +38,7 @@ export default function RootLayout({
         <Navbar />
         {children}
         <Footer />
+        <AIChatWidget />
       </body>
     </html>
   )

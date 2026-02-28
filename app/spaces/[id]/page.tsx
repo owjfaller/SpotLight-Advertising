@@ -6,6 +6,7 @@ import { getSpaceById } from '@/lib/queries/spaces'
 import { formatPrice } from '@/lib/utils/formatters'
 import { MOCK_SPACES, MOCK_EXTRAS } from '@/lib/mock/spaces'
 import ContactBlock from '@/components/spaces/ContactBlock'
+import ReviewsSection from '@/components/spaces/ReviewsSection'
 
 interface SpaceDetailPageProps {
   params: { id: string }
@@ -106,6 +107,9 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
                 <p className="text-sm leading-relaxed text-gray-700">{space.description}</p>
               </div>
             )}
+
+            {/* Reviews */}
+            <ReviewsSection spaceId={space.id} />
 
             {/* Listing details */}
             <div className="rounded-xl bg-white p-6 shadow-sm">
