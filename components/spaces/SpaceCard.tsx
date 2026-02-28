@@ -61,18 +61,29 @@ export default function SpaceCard({
           boxShadow: isHighlighted ? `0 0 0 2px var(--accent)` : undefined,
         }}
       >
-        {hasImage && (
-          <img
-            src={imageUrl}
-            alt={space.title}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            loading="lazy"
-            onError={() => setImgError(true)}
-          />
-        )}
-
-        {hasImage && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        {hasImage ? (
+          <>
+            <img
+              src={imageUrl}
+              alt={space.title}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              loading="lazy"
+              onError={() => setImgError(true)}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+          </>
+        ) : (
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center gap-1"
+            style={{
+              background: `linear-gradient(135deg, ${color}cc, ${color}88)`,
+            }}
+          >
+            <span style={{ fontSize: '2rem', lineHeight: 1 }}>{typeEmojis[space.space_type] ?? '📍'}</span>
+            <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              {space.space_type}
+            </span>
+          </div>
         )}
 
         {/* Price overlay bottom-left */}

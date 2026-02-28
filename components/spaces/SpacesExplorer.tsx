@@ -312,7 +312,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
       {/* ── Desktop sidebar ── */}
       <aside
         className="hidden md:flex w-60 shrink-0 flex-col overflow-hidden"
-        style={{ background: '#fff', borderRight: '1px solid #e5e0d5' }}
+        style={{ background: '#fff', borderRight: '1px solid rgba(0,0,0,0.06)' }}
       >
         <div className="flex-none px-5 py-4" style={{ background: '#e8a838', borderBottom: '1px solid #d4922a' }}>
           <h1
@@ -382,19 +382,19 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
           </div>
 
           {/* Price range */}
-          <div style={{ borderTop: '1px solid #e5ddd0', paddingTop: '1rem' }}>
+          <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '1rem' }}>
             <p style={sectionLabel}>Price range</p>
             {priceRangeSection}
           </div>
 
           {/* Proximity */}
-          <div style={{ borderTop: '1px solid #e5ddd0', paddingTop: '1rem' }}>
+          <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '1rem' }}>
             <p style={sectionLabel}>Proximity</p>
             {proximitySection}
           </div>
 
           {/* Campaign dates */}
-          <div style={{ borderTop: '1px solid #e5ddd0', paddingTop: '1rem' }}>
+          <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '1rem' }}>
             <p style={sectionLabel}>Campaign dates</p>
             {campaignDatesSection}
           </div>
@@ -407,12 +407,12 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
         className={`flex flex-col overflow-hidden w-full md:w-[28rem] md:shrink-0 ${
           mobileView === 'map' ? 'hidden md:flex' : 'flex'
         }`}
-        style={{ background: '#fff', borderRight: '1px solid #e5e0d5' }}
+        style={{ background: '#fff', borderRight: '1px solid rgba(0,0,0,0.06)' }}
       >
         {/* Header bar */}
         <div
           className="flex-none px-4 py-3"
-          style={{ borderBottom: '1px solid #e5e0d5' }}
+          style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
         >
           <div className="flex items-center justify-between">
             <p style={{ fontSize: '0.8125rem', color: '#9a8c7a' }}>
@@ -469,7 +469,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
           {showMobileFilters && (
             <div
               className="mt-3 space-y-4 pt-3 md:hidden"
-              style={{ borderTop: '1px solid #e5ddd0' }}
+              style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
             >
               {/* City */}
               <form method="GET" action="/spaces" className="flex gap-1.5">
