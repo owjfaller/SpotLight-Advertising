@@ -6,25 +6,52 @@ interface SpaceCardProps {
   space: AdSpace
 }
 
+// Deterministic placeholder color per space type
+const typeColors: Record<string, string> = {
+  Billboard: 'bg-blue-100',
+  Vehicle: 'bg-amber-100',
+  Indoor: 'bg-green-100',
+  Outdoor: 'bg-sky-100',
+  Digital: 'bg-purple-100',
+  Event: 'bg-pink-100',
+}
+
+const typeEmojis: Record<string, string> = {
+  Billboard: '🪧',
+  Vehicle: '🚚',
+  Indoor: '🏢',
+  Outdoor: '🌳',
+  Digital: '📺',
+  Event: '🎪',
+}
+
 export default function SpaceCard({ space }: SpaceCardProps) {
+  const color = typeColors[space.space_type] ?? 'bg-gray-100'
+  const emoji = typeEmojis[space.space_type] ?? '📍'
+
   return (
-    <Link
-      href={`/spaces/${space.id}`}
-      className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md"
-    >
-      <div className="flex items-start justify-between gap-2">
-        <h2 className="font-semibold text-gray-900 line-clamp-1">{space.title}</h2>
-        <span className="shrink-0 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+    <Link href={`/spaces/${space.id}`} className="group block">
+      {/* Square image area */}
+      <div
+        className={`relative aspect-square w-full rounded-lg ${color} flex items-center justify-center overflow-hidden`}
+      >
+        <span className="text-5xl">{emoji}</span>
+        {/* Type badge */}
+        <span className="absolute bottom-2 left-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
           {space.space_type}
         </span>
       </div>
-      <p className="mt-1 text-sm text-gray-500">{space.city}</p>
-      {space.description && (
-        <p className="mt-2 text-sm text-gray-600 line-clamp-2">{space.description}</p>
-      )}
-      <p className="mt-3 text-base font-bold text-indigo-600">
-        {formatPrice(space.price_cents)}<span className="text-sm font-normal text-gray-500">/mo</span>
-      </p>
+
+      {/* Info below image */}
+      <div className="mt-1.5 px-0.5">
+        <p className="text-base font-bold text-gray-900">
+          {formatPrice(space.price_cents)}/mo
+        </p>
+        <p className="mt-0.5 text-sm font-medium text-gray-800 line-clamp-1 group-hover:underline">
+          {space.title}
+        </p>
+        <p className="text-xs text-gray-500">{space.city}</p>
+      </div>
     </Link>
   )
 }

@@ -1,3 +1,14 @@
+export interface Profile {
+  id: string
+  email: string | null
+  full_name: string | null
+  avatar_url: string | null
+  can_be_owner: boolean
+  can_be_advertiser: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface AdSpace {
   id: string
   owner_id: string
