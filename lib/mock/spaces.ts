@@ -2,7 +2,7 @@ import { AdSpace, AdSpaceMapMarker } from '@/lib/types/database.types'
 
 export const MOCK_SPACES: AdSpace[] = [
   {
-    id: '1', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '1', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Downtown Billboard — Times Square',
     description: 'Premium digital billboard in the heart of Times Square, one of the most trafficked intersections in the world. Over 380,000 daily pedestrian visits. Ideal for national brand campaigns and product launches.',
     space_type: 'Billboard', price_cents: 150000,
@@ -10,7 +10,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 40.758, lng: -73.9855,
   },
   {
-    id: '2', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '2', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Wrapped Delivery Van',
     description: 'Full vehicle wrap on a high-frequency delivery van covering the Chicago metro area. Estimated 12,000+ daily impressions. Route covers downtown, Lincoln Park, and Wicker Park neighborhoods.',
     space_type: 'Vehicle', price_cents: 45000,
@@ -18,7 +18,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 41.8827, lng: -87.6233,
   },
   {
-    id: '3', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '3', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Airport Terminal Screen',
     description: 'High-visibility digital screen in the international departures terminal at LAX. Reach over 50,000 daily travelers from around the world. Minimum dwell time of 35 minutes per passenger.',
     space_type: 'Digital', price_cents: 90000,
@@ -26,7 +26,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 33.9425, lng: -118.408,
   },
   {
-    id: '4', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '4', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Rooftop Mural Wall',
     description: 'Large rooftop mural wall on a 6-story building in downtown Austin. Visible from the 6th Street entertainment district and I-35. Perfect for brands targeting the 21–35 demographic.',
     space_type: 'Outdoor', price_cents: 60000,
@@ -34,7 +34,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 30.2672, lng: -97.7431,
   },
   {
-    id: '5', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '5', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Mall Atrium Display',
     description: 'Center-court display in Miami\'s Dadeland Mall atrium. 45 million annual visitors. Premium placement surrounded by luxury retail — ideal for fashion, tech, and lifestyle brands.',
     space_type: 'Indoor', price_cents: 35000,
@@ -42,7 +42,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 25.7617, lng: -80.1918,
   },
   {
-    id: '6', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '6', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Festival Grounds Banner',
     description: 'Premium banner placement across multiple stages at Nashville\'s outdoor festival grounds. Events held spring through fall attract 5,000–20,000 attendees each weekend.',
     space_type: 'Event', price_cents: 25000,
@@ -50,7 +50,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 36.1627, lng: -86.7816,
   },
   {
-    id: '7', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '7', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Downtown SLC Billboard',
     description: 'High-impact billboard on Main Street in the heart of Salt Lake City\'s business district. Visible to commuters on I-15 and thousands of daily pedestrians. Perfect for regional brand awareness campaigns.',
     space_type: 'Billboard', price_cents: 55000,
@@ -58,7 +58,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 40.7608, lng: -111.891,
   },
   {
-    id: '8', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '8', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Park City Mountain Kiosk',
     description: 'Premium outdoor kiosk at the base of Park City Mountain Resort — one of the largest ski resorts in the US. Reach affluent skiers and snowboarders throughout the winter season, plus summer mountain bikers.',
     space_type: 'Outdoor', price_cents: 48000,
@@ -66,7 +66,7 @@ export const MOCK_SPACES: AdSpace[] = [
     lat: 40.6461, lng: -111.498,
   },
   {
-    id: '9', owner_id: '', status: 'published', created_at: '', updated_at: '',
+    id: '9', owner_id: '', status: 'published', created_at: '', updated_at: '', image_url: null, start_date: null, end_date: null,
     title: 'Provo Tech Hub Digital Screen',
     description: 'Large-format digital screen inside the Provo Tech Hub co-working space, frequented by Utah Valley\'s fast-growing startup community. Ideal for B2B, SaaS, and recruiting campaigns.',
     space_type: 'Digital', price_cents: 22000,

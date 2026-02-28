@@ -7,8 +7,8 @@ import NavbarActions from './NavbarActions'
 
 export default function NavbarShell({ user }: { user: User | null }) {
   const pathname = usePathname()
-  const isLight = (pathname.startsWith('/spaces') && pathname !== '/spaces/new') || pathname.startsWith('/dashboard')
-  const isBlack = pathname === '/spaces/new'
+  const isLight = pathname.startsWith('/spaces') || pathname.startsWith('/dashboard')
+  const isBlack = false
 
   return (
     <nav

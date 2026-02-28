@@ -8,6 +8,7 @@ import { AdSpace } from '@/lib/types/database.types'
 import { formatPrice } from '@/lib/utils/formatters'
 import ContactBlock from '@/components/spaces/ContactBlock'
 import InterestedButton from '@/components/spaces/InterestedButton'
+import ReviewsSection from '@/components/spaces/ReviewsSection'
 
 interface SpaceDetailPageProps {
   params: { id: string }
@@ -128,6 +129,9 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
                 <p className="text-sm leading-relaxed text-gray-700">{space.description}</p>
               </div>
             )}
+
+            {/* Reviews Section */}
+            <ReviewsSection spaceId={space.id} />
 
             {/* Listing details */}
             <div className="rounded-xl bg-white p-6 shadow-sm">

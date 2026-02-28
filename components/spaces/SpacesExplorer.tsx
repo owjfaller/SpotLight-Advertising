@@ -122,10 +122,17 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
         setUserLng(pos.coords.longitude)
         setGeoLoading(false)
       },
-      () => {
-        setGeoError('Location access was denied.')
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError("Location blocked. Enable it in your browser\u2019s site settings, then try again.")
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setGeoError('Your location could not be determined. Try again.')
+        } else {
+          setGeoError('Location request timed out. Try again.')
+        }
         setGeoLoading(false)
       },
+      { timeout: 10000, maximumAge: 60000 },
     )
   }
 
@@ -143,17 +150,6 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
     background: '#f7f3ed',
     border: '1px solid #e5ddd0',
     color: '#1a1208',
-    borderRadius: '0.5rem',
-    fontSize: '0.8125rem',
-    padding: '0.5rem 0.75rem',
-    width: '100%',
-    outline: 'none',
-  }
-
-  const inputStyle = {
-    background: 'var(--bg)',
-    border: '1px solid var(--border)',
-    color: 'var(--text)',
     borderRadius: '0.5rem',
     fontSize: '0.8125rem',
     padding: '0.5rem 0.75rem',
@@ -306,7 +302,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   return (
     <div
       className="flex h-[calc(100vh-56px)] overflow-hidden"
-      style={{ background: 'var(--bg)' }}
+      style={{ background: '#fff' }}
     >
 
       {/* ── Desktop sidebar ── */}
@@ -314,7 +310,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
         className="hidden md:flex w-60 shrink-0 flex-col overflow-hidden"
         style={{ background: '#fff', borderRight: '1px solid #e5e7eb' }}
       >
-        <div className="flex-none px-5 py-4" style={{ background: '#e8a838', borderBottom: '1px solid #d4922a' }}>
+        <div className="flex-none px-5 py-2.5" style={{ background: '#e8a838', borderBottom: '1px solid #d4922a' }}>
           <h1
             className="font-display"
             style={{ fontSize: '1.35rem', color: '#0d1117', letterSpacing: '-0.01em' }}

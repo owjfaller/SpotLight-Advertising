@@ -15,23 +15,14 @@ interface SpaceCardProps {
 }
 
 const typeColors: Record<string, string> = {
-  Billboard: '#1e3a5f',
-  Vehicle:   '#3d2a0a',
-  Indoor:    '#0f2e1a',
-  Outdoor:   '#0f2a2e',
-  Digital:   '#1e1040',
-  Event:     '#2e0f2a',
+  Billboard: '#1c1208',
+  Vehicle:   '#1a1005',
+  Indoor:    '#0e1408',
+  Outdoor:   '#091610',
+  Digital:   '#14101e',
+  Event:     '#1e0e0a',
 }
 
-// Curated picsum IDs — each reliably shows a contextually relevant scene
-const typePicsumId: Record<string, number> = {
-  Billboard: 325,  // city street with large signage
-  Vehicle:   133,  // truck / transport
-  Indoor:    164,  // interior hall / atrium
-  Outdoor:   192,  // urban wall / street scene
-  Digital:    24,  // colourful lights / screens
-  Event:     167,  // outdoor crowd / market
-}
 
 
 export default function SpaceCard({
@@ -43,9 +34,9 @@ export default function SpaceCard({
   onToggleFavorite,
 }: SpaceCardProps) {
   const color = typeColors[space.space_type] ?? '#1a2130'
-  const uploadedUrl = (space as any).image_url ?? null
-  const picsumId = typePicsumId[space.space_type] ?? 10
-  const picsumUrl = `https://picsum.photos/id/${picsumId}/400/300`
+  const uploadedUrl = (space as AdSpace & { image_url?: string }).image_url ?? null
+  const seed = encodeURIComponent(space.title ?? space.id)
+  const picsumUrl = `https://picsum.photos/seed/${seed}/400/300`
 
   // src cycles: uploadedUrl → picsumUrl → null (solid colour fallback)
   const [src, setSrc] = useState<string | null>(uploadedUrl ?? picsumUrl)
@@ -67,6 +58,7 @@ export default function SpaceCard({
         }}
       >
         {showImage && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={src!}
             alt={space.title}
