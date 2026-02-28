@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { AdSpace } from '@/lib/types/database.types'
 import { formatPrice } from '@/lib/utils/formatters'
@@ -15,20 +16,20 @@ interface SpaceCardProps {
 
 const typeColors: Record<string, string> = {
   Billboard: 'bg-blue-100',
-  Vehicle: 'bg-amber-100',
-  Indoor: 'bg-green-100',
-  Outdoor: 'bg-sky-100',
-  Digital: 'bg-purple-100',
-  Event: 'bg-pink-100',
+  Vehicle:   'bg-amber-100',
+  Indoor:    'bg-green-100',
+  Outdoor:   'bg-sky-100',
+  Digital:   'bg-purple-100',
+  Event:     'bg-pink-100',
 }
 
 const typeEmojis: Record<string, string> = {
   Billboard: '🪧',
-  Vehicle: '🚚',
-  Indoor: '🏢',
-  Outdoor: '🌳',
-  Digital: '📺',
-  Event: '🎪',
+  Vehicle:   '🚚',
+  Indoor:    '🏢',
+  Outdoor:   '🌳',
+  Digital:   '📺',
+  Event:     '🎪',
 }
 
 export default function SpaceCard({
@@ -39,8 +40,12 @@ export default function SpaceCard({
   onMouseLeave,
   onToggleFavorite,
 }: SpaceCardProps) {
-  const color = typeColors[space.space_type] ?? 'bg-gray-100'
-  const emoji = typeEmojis[space.space_type] ?? '📍'
+  const [imgError, setImgError] = useState(false)
+
+  const color   = typeColors[space.space_type] ?? 'bg-gray-100'
+  const emoji   = typeEmojis[space.space_type] ?? '📍'
+  // Deterministic unique image per listing — seed is stable per space ID
+  const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/600/400`
 
   return (
     <Link
@@ -51,11 +56,29 @@ export default function SpaceCard({
     >
       {/* Square image area */}
       <div
-        className={`relative aspect-square w-full rounded-lg ${color} flex items-center justify-center overflow-hidden transition-shadow ${
-          isHighlighted ? 'ring-2 ring-blue-600 ring-offset-1' : ''
-        }`}
+        className={`relative aspect-square w-full rounded-lg overflow-hidden flex items-center justify-center transition-shadow ${
+          imgError ? color : ''
+        } ${isHighlighted ? 'ring-2 ring-blue-600 ring-offset-1' : ''}`}
       >
-        <span className="text-5xl">{emoji}</span>
+        {/* Photo background — eslint-disable-next-line @next/next/no-img-element */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {!imgError && (
+          <img
+            src={imageUrl}
+            alt={space.title}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        )}
+
+        {/* Fallback emoji */}
+        {imgError && <span className="text-5xl">{emoji}</span>}
+
+        {/* Gradient overlay so badges stay readable over photos */}
+        {!imgError && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        )}
 
         {/* Type badge */}
         <span className="absolute bottom-2 left-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
