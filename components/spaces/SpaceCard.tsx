@@ -15,12 +15,12 @@ interface SpaceCardProps {
 }
 
 const typeColors: Record<string, string> = {
-  Billboard: '#1e3a5f',
-  Vehicle:   '#3d2a0a',
-  Indoor:    '#0f2e1a',
-  Outdoor:   '#0f2a2e',
-  Digital:   '#1e1040',
-  Event:     '#2e0f2a',
+  Billboard: '#1c1208',
+  Vehicle:   '#1a1005',
+  Indoor:    '#0e1408',
+  Outdoor:   '#091610',
+  Digital:   '#14101e',
+  Event:     '#1e0e0a',
 }
 
 

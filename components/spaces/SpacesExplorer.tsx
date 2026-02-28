@@ -302,7 +302,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   return (
     <div
       className="flex h-[calc(100vh-56px)] overflow-hidden"
-      style={{ background: 'var(--bg)' }}
+      style={{ background: '#fff' }}
     >
 
       {/* ── Desktop sidebar ── */}
