@@ -134,18 +134,18 @@ export default function ReviewsSection({ spaceId }: ReviewsSectionProps) {
   const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
-    const supabase = createClient()
+    const hasSupabase = !!process.env.NEXT_PUBLIC_SUPABASE_URL
 
     async function load() {
-      const { data: { user: u } } = await supabase.auth.getUser()
-      setUser(u ? { id: u.id } : null)
-
-      const hasSupabase = !!process.env.NEXT_PUBLIC_SUPABASE_URL
       if (!hasSupabase) {
         setReviews(MOCK_REVIEWS)
         setLoading(false)
         return
       }
+
+      const supabase = createClient()
+      const { data: { user: u } } = await supabase.auth.getUser()
+      setUser(u ? { id: u.id } : null)
 
       try {
         const res = await fetch(`/api/reviews/${spaceId}`)
