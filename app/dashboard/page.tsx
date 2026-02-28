@@ -65,7 +65,7 @@ export default function DashboardPage() {
       show: profile?.can_be_advertiser ?? true,
     },
     {
-      href: '/dashboard/inquiries',
+      href: '/dashboard/messages',
       label: 'View inquiries',
       sub: 'See all booking requests and messages',
       show: true,

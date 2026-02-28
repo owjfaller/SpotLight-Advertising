@@ -47,6 +47,26 @@ export interface AdSpaceInterest {
   created_at: string
 }
 
+export interface Conversation {
+  id: string
+  ad_space_id: string | null
+  buyer_id: string
+  seller_id: string
+  created_at: string
+  ad_spaces?: { title: string }
+  buyer?: { full_name: string; avatar_url: string | null }
+  seller?: { full_name: string; avatar_url: string | null }
+}
+
+export interface Message {
+  id: string
+  conversation_id: string
+  sender_id: string
+  content: string
+  read_at: string | null
+  created_at: string
+}
+
 export interface Review {
   id: string
   ad_space_id: string

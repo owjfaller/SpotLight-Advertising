@@ -3,6 +3,7 @@
 -- ============================================================
 
 -- Cleanup old mockup tables if they exist
+DROP TABLE IF EXISTS ad_space_interests CASCADE;
 DROP TABLE IF EXISTS ad_space_buyers CASCADE;
 DROP TABLE IF EXISTS ad_spaces CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -129,6 +130,57 @@ CREATE POLICY "Users can express interest" ON ad_space_interests
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- ============================================================
+-- MESSAGING
+-- ============================================================
+
+CREATE TABLE conversations (
+  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  ad_space_id  UUID REFERENCES ad_spaces(id) ON DELETE SET NULL,
+  buyer_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  seller_id    UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(buyer_id, seller_id, ad_space_id)
+);
+
+ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own conversations" ON conversations
+  FOR SELECT USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
+
+CREATE POLICY "Users can start a conversation" ON conversations
+  FOR INSERT WITH CHECK (auth.uid() = buyer_id);
+
+CREATE TABLE messages (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  sender_id       UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  content         TEXT NOT NULL,
+  read_at         TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view messages in their conversations" ON messages
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM conversations
+      WHERE id = messages.conversation_id
+      AND (buyer_id = auth.uid() OR seller_id = auth.uid())
+    )
+  );
+
+CREATE POLICY "Users can send messages in their conversations" ON messages
+  FOR INSERT WITH CHECK (
+    auth.uid() = sender_id AND
+    EXISTS (
+      SELECT 1 FROM conversations
+      WHERE id = messages.conversation_id
+      AND (buyer_id = auth.uid() OR seller_id = auth.uid())
+    )
+  );
+
+-- ============================================================
 -- FUNCTIONS & TRIGGERS
 -- ============================================================
 
@@ -146,3 +198,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- ============================================================
+-- ENABLE REALTIME
+-- ============================================================
+-- Add tables to the supabase_realtime publication
+ALTER PUBLICATION supabase_realtime ADD TABLE conversations;
+ALTER PUBLICATION supabase_realtime ADD TABLE messages;

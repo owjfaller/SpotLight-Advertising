@@ -186,8 +186,10 @@ export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
               </div>
               <InterestedButton spaceId={space.id} />
               <ContactBlock
+                spaceId={space.id}
                 listingTitle={space.title}
                 ownerName={extras.owner_name}
+                ownerId={space.owner_id}
               />
               <Link
                 href="/spaces"

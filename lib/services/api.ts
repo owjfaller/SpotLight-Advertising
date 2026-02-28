@@ -1,4 +1,4 @@
-import { AdSpace, SpaceType, Profile } from '../types/database.types'
+import { AdSpace, SpaceType, Profile, Conversation, Message } from '../types/database.types'
 
 export interface AdSpaceFilters {
   low_price?: number
@@ -80,6 +80,29 @@ class ApiService {
       published: AdSpace[]
       interestedIn: Record<string, unknown>[]
     }>('/api/profiles/me')
+  }
+
+  // Messaging
+  async getConversations(): Promise<Conversation[]> {
+    return this.request<Conversation[]>('/api/messages/conversations')
+  }
+
+  async startConversation(adSpaceId: string, sellerId: string): Promise<Conversation> {
+    return this.request<Conversation>('/api/messages/conversations', {
+      method: 'POST',
+      body: JSON.stringify({ adSpaceId, sellerId }),
+    })
+  }
+
+  async getMessages(conversationId: string): Promise<Message[]> {
+    return this.request<Message[]>(`/api/messages/conversations/${conversationId}`)
+  }
+
+  async sendMessage(conversationId: string, content: string): Promise<Message> {
+    return this.request<Message>(`/api/messages/conversations/${conversationId}`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    })
   }
 }
 
