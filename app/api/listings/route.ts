@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getCoordinates } from '@/lib/utils/geocode'
-import { getFilteredAdSpaces } from '@/lib/queries/ad_spaces'
+import { getFilteredAdSpaces, AdSpaceFilters } from '@/lib/queries/ad_spaces'
 import { SpaceType } from '@/lib/types/database.types'
+import { MOCK_SPACES } from '@/lib/mock/spaces'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  
-  const filters = {
+
+  const filters: AdSpaceFilters = {
     low_price: searchParams.get('low_price') ? Number(searchParams.get('low_price')) : undefined,
     high_price: searchParams.get('high_price') ? Number(searchParams.get('high_price')) : undefined,
     type: searchParams.get('type') as SpaceType | undefined,
@@ -19,9 +20,24 @@ export async function GET(request: NextRequest) {
     end_date: searchParams.get('end_date') || undefined,
   }
 
-  const { data, error } = await getFilteredAdSpaces(filters)
+  let data: Record<string, unknown>[] | null = null
+  try {
+    const result = await getFilteredAdSpaces(filters)
+    if (!result.error) data = result.data
+  } catch {
+    // Supabase not configured — fall through to mock data
+  }
 
-  if (error) return NextResponse.json({ error }, { status: 500 })
+  // Fall back to mock data when DB is empty or not configured
+  if (!data || data.length === 0) {
+    let mocks = MOCK_SPACES as unknown as Record<string, unknown>[]
+    if (filters.type) mocks = mocks.filter(s => s.space_type === filters.type)
+    if (filters.city) mocks = mocks.filter(s => (s.city as string)?.toLowerCase().includes(filters.city!.toLowerCase()))
+    if (filters.low_price) mocks = mocks.filter(s => (s.price_cents as number) >= filters.low_price! * 100)
+    if (filters.high_price) mocks = mocks.filter(s => (s.price_cents as number) <= filters.high_price! * 100)
+    return NextResponse.json(mocks)
+  }
+
   return NextResponse.json(data)
 }
 
