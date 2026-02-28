@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       title,
       owner: profile?.display_name ?? null,
       space_type: type,
-      location_address: location,
+      address: location,
       city,
       lat: coords?.lat ?? null,
       lng: coords?.lng ?? null,
