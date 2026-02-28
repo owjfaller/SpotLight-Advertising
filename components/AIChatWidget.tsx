@@ -187,12 +187,11 @@ export default function AIChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
 
       {/* ── Chat panel ── */}
       {open && (
-        <div className="flex w-[360px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
-          style={{ height: '520px' }}>
+        <div style={{ width: '360px', height: '520px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: '16px', border: '1px solid #e5e7eb', background: '#fff', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
 
           {/* Header */}
           <div className="flex shrink-0 items-center justify-between px-4 py-3" style={{ background: '#0d1117' }}>
@@ -248,7 +247,7 @@ export default function AIChatWidget() {
                           <span className="animate-bounce" style={{ animationDelay: '300ms' }}>•</span>
                         </span>
                       ) : (
-                        text || msg.content
+                        text
                       )}
                     </div>
 
