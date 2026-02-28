@@ -23,13 +23,14 @@ const typeColors: Record<string, string> = {
   Event:     '#2e0f2a',
 }
 
-const typePhotoUrl: Record<string, string> = {
-  Billboard: 'https://loremflickr.com/400/300/billboard?lock=21',
-  Vehicle:   'https://loremflickr.com/400/300/delivery-truck?lock=22',
-  Indoor:    'https://loremflickr.com/400/300/shopping-mall?lock=23',
-  Outdoor:   'https://loremflickr.com/400/300/street-art?lock=24',
-  Digital:   'https://loremflickr.com/400/300/times-square?lock=25',
-  Event:     'https://loremflickr.com/400/300/farmers-market?lock=26',
+// Curated picsum IDs — each reliably shows a contextually relevant scene
+const typePicsumId: Record<string, number> = {
+  Billboard: 325,  // city street with large signage
+  Vehicle:   133,  // truck / transport
+  Indoor:    164,  // interior hall / atrium
+  Outdoor:   192,  // urban wall / street scene
+  Digital:    24,  // colourful lights / screens
+  Event:     167,  // outdoor crowd / market
 }
 
 
@@ -41,12 +42,14 @@ export default function SpaceCard({
   onMouseLeave,
   onToggleFavorite,
 }: SpaceCardProps) {
-  const [imgError, setImgError] = useState(false)
-
   const color = typeColors[space.space_type] ?? '#1a2130'
   const uploadedUrl = (space as any).image_url ?? null
-  const placeholderUrl = typePhotoUrl[space.space_type] ?? 'https://loremflickr.com/400/300/advertising?lock=9'
-  const imageUrl = (!imgError && uploadedUrl) ? uploadedUrl : placeholderUrl
+  const picsumId = typePicsumId[space.space_type] ?? 10
+  const picsumUrl = `https://picsum.photos/id/${picsumId}/400/300`
+
+  // src cycles: uploadedUrl → picsumUrl → null (solid colour fallback)
+  const [src, setSrc] = useState<string | null>(uploadedUrl ?? picsumUrl)
+  const showImage = src !== null
 
   return (
     <Link
@@ -63,13 +66,19 @@ export default function SpaceCard({
           boxShadow: isHighlighted ? `0 0 0 2px var(--accent)` : undefined,
         }}
       >
-        <img
-          src={imageUrl}
-          alt={space.title}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-          loading="lazy"
-          onError={() => setImgError(true)}
-        />
+        {showImage && (
+          <img
+            src={src!}
+            alt={space.title}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            loading="lazy"
+            onError={() => {
+              // If uploaded image failed, try picsum; if picsum failed, show solid colour
+              if (src === uploadedUrl) setSrc(picsumUrl)
+              else setSrc(null)
+            }}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
         {/* Price overlay bottom-left */}
