@@ -25,3 +25,37 @@ export async function updateProfile(
 
   return { error: error?.message ?? null }
 }
+
+export async function getUserInfo(username: string): Promise<{
+  published: any[] | null;
+  rentingTo: any[] | null;
+  error: string | null;
+}> {
+  const supabase = createClient()
+
+  // 1. Get listings published by this user
+  const { data: published, error: pubError } = await supabase
+    .from('listings')
+    .select('*')
+    .eq('owner', username)
+
+  if (pubError) return { published: null, rentingTo: null, error: pubError.message }
+
+  // 2. Get renters (listing_buyers) who are "renting" or interested in those listings
+  // We use listings!inner to join and filter by the owner username
+  const { data: rentingTo, error: rentError } = await supabase
+    .from('listing_buyers')
+    .select(`
+      username,
+      added_at,
+      listing_id,
+      listings!inner (
+        title
+      )
+    `)
+    .eq('listings.owner', username)
+
+  if (rentError) return { published, rentingTo: null, error: rentError.message }
+
+  return { published, rentingTo, error: null }
+}
