@@ -41,7 +41,7 @@ export async function addListing(
   const supabase = createClient()
 
   const { data, error } = await supabase
-    .from('listings')
+    .from('ad_spaces')
     .insert({
       id,
       title,
@@ -68,7 +68,7 @@ export async function getListingByTitleAndOwner(
   const supabase = createClient()
 
   const { data, error } = await supabase
-    .from('listings')
+    .from('ad_spaces')
     .select('id')
     .eq('title', title)
     .eq('owner', username)

@@ -25,7 +25,7 @@ CREATE TABLE users (
 -- ============================================================
 -- LISTINGS
 -- ============================================================
-CREATE TABLE listings (
+CREATE TABLE ad_spaces (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title            TEXT NOT NULL,
   owner            TEXT NOT NULL REFERENCES users(username) ON DELETE CASCADE,
@@ -46,7 +46,7 @@ ALTER TABLE listings ADD CONSTRAINT unique_title_per_owner UNIQUE (title, owner)
 -- LISTING BUYERS  (many-to-many: listings <-> users)
 -- ============================================================
 CREATE TABLE listing_buyers (
-  listing_id  UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+  listing_id  UUID NOT NULL REFERENCES ad_spaces(id) ON DELETE CASCADE,
   username    TEXT NOT NULL REFERENCES users(username) ON DELETE CASCADE,
   added_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (listing_id, username)
