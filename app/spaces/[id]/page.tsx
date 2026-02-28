@@ -161,8 +161,6 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
               <ContactBlock
                 listingTitle={space.title}
                 ownerName={extras.owner_name}
-                minDuration={extras.duration_min}
-                availability={extras.availability}
               />
               <Link
                 href="/spaces"

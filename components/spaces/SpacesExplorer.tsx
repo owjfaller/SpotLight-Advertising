@@ -8,6 +8,7 @@ import { haversineDistance } from '@/lib/utils/haversine'
 
 const SPACE_TYPES   = ['Billboard', 'Vehicle', 'Indoor', 'Outdoor', 'Digital', 'Event']
 const PRICE_MAX     = 5000   // slider ceiling — $5,000 /mo
+const today         = new Date().toISOString().split('T')[0]
 
 interface SpacesExplorerProps {
   spaces: AdSpace[]
@@ -42,6 +43,8 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   const [favorites,          setFavorites]          = useState<Set<string>>(new Set())
   const [minPriceDollars,    setMinPriceDollars]    = useState(0)
   const [maxPriceDollars,    setMaxPriceDollars]    = useState(PRICE_MAX)
+  const [startDate,          setStartDate]          = useState('')
+  const [endDate,            setEndDate]            = useState('')
 
   // Load favorites from localStorage on mount
   useEffect(() => {
@@ -228,6 +231,47 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
     </div>
   )
 
+  const campaignDatesSection = (
+    <div className="space-y-2">
+      <div>
+        <label className="mb-1 block text-xs text-gray-400">Start date</label>
+        <input
+          type="date"
+          value={startDate}
+          min={today}
+          onChange={(e) => {
+            setStartDate(e.target.value)
+            if (endDate && e.target.value > endDate) setEndDate('')
+          }}
+          className="w-full rounded-lg border border-gray-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-xs text-gray-400">End date</label>
+        <input
+          type="date"
+          value={endDate}
+          min={startDate || today}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="w-full rounded-lg border border-gray-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+        />
+      </div>
+      {startDate && endDate && (
+        <p className="text-xs font-semibold text-[#1877F2]">
+          {startDate} → {endDate}
+        </p>
+      )}
+      {(startDate || endDate) && (
+        <button
+          onClick={() => { setStartDate(''); setEndDate('') }}
+          className="text-xs text-gray-400 hover:text-gray-600 hover:underline"
+        >
+          Clear dates
+        </button>
+      )}
+    </div>
+  )
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="flex h-[calc(100vh-56px)] overflow-hidden">
@@ -313,6 +357,14 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
             {proximitySection}
           </div>
 
+          {/* Campaign dates */}
+          <div className="border-t border-gray-200 pt-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Campaign dates
+            </p>
+            {campaignDatesSection}
+          </div>
+
         </nav>
       </aside>
 
@@ -390,6 +442,11 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Proximity</p>
                 {proximitySection}
+              </div>
+              {/* Campaign dates */}
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Campaign dates</p>
+                {campaignDatesSection}
               </div>
             </div>
           )}

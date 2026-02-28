@@ -5,8 +5,6 @@ import { useState, useRef, useEffect } from 'react'
 interface ContactBlockProps {
   listingTitle: string
   ownerName: string
-  minDuration: string
-  availability: string
 }
 
 interface Message {
@@ -44,41 +42,15 @@ const PRESETS = [
   },
 ] as const
 
-function calcDuration(start: string, end: string): string {
-  if (!start || !end) return ''
-  const s = new Date(start)
-  const e = new Date(end)
-  if (e <= s) return ''
-  const totalDays = Math.ceil((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24))
-  const months =
-    (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth())
-  if (months < 1) return `${totalDays} day${totalDays === 1 ? '' : 's'}`
-  const remainDays = totalDays - months * 30
-  return remainDays > 0
-    ? `${months} month${months === 1 ? '' : 's'} + ${remainDays} day${remainDays === 1 ? '' : 's'}`
-    : `${months} month${months === 1 ? '' : 's'}`
-}
-
-const today = new Date().toISOString().split('T')[0]
-
-export default function ContactBlock({
-  listingTitle,
-  ownerName,
-  minDuration,
-  availability,
-}: ContactBlockProps) {
-  const [startDate, setStartDate] = useState('')
-  const [endDate,   setEndDate]   = useState('')
-  const [chatOpen,  setChatOpen]  = useState(false)
-  const [phase,     setPhase]     = useState<'presets' | 'chat'>('presets')
-  const [messages,  setMessages]  = useState<Message[]>([])
-  const [input,     setInput]     = useState('')
-  const [sending,   setSending]   = useState(false)
+export default function ContactBlock({ listingTitle, ownerName }: ContactBlockProps) {
+  const [chatOpen, setChatOpen] = useState(false)
+  const [phase,    setPhase]    = useState<'presets' | 'chat'>('presets')
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input,    setInput]    = useState('')
+  const [sending,  setSending]  = useState(false)
 
   const inputRef  = useRef<HTMLTextAreaElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-
-  const duration = calcDuration(startDate, endDate)
 
   // Auto-scroll chat to bottom when new messages arrive
   useEffect(() => {
@@ -107,16 +79,9 @@ export default function ContactBlock({
       return
     }
 
-    const dateNote =
-      startDate && endDate
-        ? ` — Campaign: ${startDate} to ${endDate}${duration ? ` (${duration})` : ''}.`
-        : ''
-    const userMsg = `${label}${dateNote}`
-
-    setMessages([{ text: userMsg, sender: 'user' }])
+    setMessages([{ text: label, sender: 'user' }])
     setPhase('chat')
 
-    // Simulate owner acknowledgement
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
@@ -148,46 +113,6 @@ export default function ContactBlock({
 
   return (
     <>
-      {/* ── Campaign date range ─────────────────────────────── */}
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="mb-1 block text-xs text-gray-400">Start date</label>
-            <input
-              type="date"
-              value={startDate}
-              min={today}
-              onChange={(e) => {
-                setStartDate(e.target.value)
-                if (endDate && e.target.value > endDate) setEndDate('')
-              }}
-              className="w-full rounded-lg border border-gray-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs text-gray-400">End date</label>
-            <input
-              type="date"
-              value={endDate}
-              min={startDate || today}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
-            />
-          </div>
-        </div>
-
-        {/* Live duration + owner constraint */}
-        <div className="flex items-center justify-between text-xs">
-          {duration ? (
-            <span className="font-semibold text-[#1877F2]">Duration: {duration}</span>
-          ) : (
-            <span className="text-gray-400">Select your campaign dates</span>
-          )}
-          <span className="text-gray-400">{minDuration} min.</span>
-        </div>
-        <p className="text-xs text-gray-400">Availability: {availability}</p>
-      </div>
-
       {/* ── CTA button ─────────────────────────────────────── */}
       <button
         onClick={openChat}
