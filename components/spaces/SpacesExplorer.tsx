@@ -7,7 +7,7 @@ import { AdSpace, AdSpaceMapMarker } from '@/lib/types/database.types'
 import { haversineDistance } from '@/lib/utils/haversine'
 
 const SPACE_TYPES   = ['Billboard', 'Vehicle', 'Indoor', 'Outdoor', 'Digital', 'Event']
-const PRICE_MAX     = 5000
+const PRICE_MAX     = 10000
 const today         = new Date().toISOString().split('T')[0]
 
 interface SpacesExplorerProps {
@@ -43,7 +43,7 @@ export default function SpacesExplorer({ spaces, mapMarkers, searchParams }: Spa
   const [hoveredId,          setHoveredId]          = useState<string | null>(null)
   const [userLat,            setUserLat]            = useState<number | null>(null)
   const [userLng,            setUserLng]            = useState<number | null>(null)
-  const [radiusMiles,        setRadiusMiles]        = useState(25)
+  const [radiusMiles,        setRadiusMiles]        = useState(50)
   const [geoLoading,         setGeoLoading]         = useState(false)
   const [geoError,           setGeoError]           = useState<string | null>(null)
   const [mobileView,         setMobileView]         = useState<'list' | 'map'>('list')

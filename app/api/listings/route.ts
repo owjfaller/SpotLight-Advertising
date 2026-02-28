@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     low_price: searchParams.get('low_price') ? Number(searchParams.get('low_price')) : undefined,
     high_price: searchParams.get('high_price') ? Number(searchParams.get('high_price')) : undefined,
     type: searchParams.get('type') as SpaceType | undefined,
+    city: searchParams.get('city') || undefined,
     radius: searchParams.get('radius') ? Number(searchParams.get('radius')) : undefined,
     user_lat: searchParams.get('lat') ? Number(searchParams.get('lat')) : undefined,
     user_lng: searchParams.get('lng') ? Number(searchParams.get('lng')) : undefined,

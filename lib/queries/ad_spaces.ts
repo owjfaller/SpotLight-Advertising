@@ -7,6 +7,7 @@ export interface AdSpaceFilters {
   low_price?: number;
   high_price?: number;
   type?: SpaceType;
+  city?: string;
   radius?: number;
   user_lat?: number;
   user_lng?: number;
@@ -70,6 +71,10 @@ export async function getFilteredAdSpaces(
 
   if (filters.type) {
     query = query.eq('space_type', filters.type)
+  }
+
+  if (filters.city) {
+    query = query.ilike('city', `%${filters.city}%`)
   }
 
   if (filters.start_date) {
