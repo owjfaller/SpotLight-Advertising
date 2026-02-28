@@ -101,3 +101,12 @@ export async function getFilteredAdSpaces(
 
   return { data: results, error: null }
 }
+
+export async function addInterest(ad_space_id: string, user_id: string): Promise<{ error: string | null }> {
+  const supabase = createClient()
+  const { error } = await supabase
+    .from('ad_space_interests')
+    .insert({ ad_space_id, user_id })
+
+  return { error: error?.message ?? null }
+}

@@ -1,8 +1,9 @@
-export const dynamic = 'force-dynamic'
+'use client'
 
-import { getSpaces } from '@/lib/queries/spaces'
+import { useEffect, useState } from 'react'
+import { api, AdSpaceFilters } from '@/lib/services/api'
+import { AdSpace, AdSpaceMapMarker } from '@/lib/types/database.types'
 import SpacesExplorer from '@/components/spaces/SpacesExplorer'
-import { MOCK_SPACES, MOCK_MARKERS } from '@/lib/mock/spaces'
 
 interface SpacesPageProps {
   searchParams: {
@@ -12,34 +13,63 @@ interface SpacesPageProps {
   }
 }
 
-export default async function SpacesPage({ searchParams }: SpacesPageProps) {
-  const hasSupabase = !!process.env.NEXT_PUBLIC_SUPABASE_URL
+export default function SpacesPage({ searchParams }: SpacesPageProps) {
+  const [spaces, setSpaces] = useState<AdSpace[]>([])
+  const [mapMarkers, setMapMarkers] = useState<AdSpaceMapMarker[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const { spaces, mapMarkers } = hasSupabase
-    ? await getSpaces({ q: searchParams.q, type: searchParams.type, city: searchParams.city })
-    : {
-        spaces: MOCK_SPACES.filter(
-          (s) =>
-            (!searchParams.type || s.space_type === searchParams.type) &&
-            (!searchParams.city || s.city.toLowerCase().includes(searchParams.city.toLowerCase())),
-        ),
-        mapMarkers: MOCK_MARKERS.filter(
-          (m) =>
-            (!searchParams.type || m.space_type === searchParams.type) &&
-            (!searchParams.city || m.city.toLowerCase().includes(searchParams.city.toLowerCase())),
-        ),
+  useEffect(() => {
+    async function fetchSpaces() {
+      try {
+        setLoading(true)
+        const filters: AdSpaceFilters = {
+          type: searchParams.type as any,
+          city: searchParams.city
+        }
+        const data = await api.getListings(filters)
+        setSpaces(data)
+        
+        // Transform spaces to markers
+        const markers: AdSpaceMapMarker[] = data
+          .filter(s => s.lat != null && s.lng != null)
+          .map(s => ({
+            id: s.id,
+            title: s.title,
+            space_type: s.space_type,
+            price_cents: s.price_cents,
+            city: s.city,
+            lat: s.lat!,
+            lng: s.lng!
+          }))
+        setMapMarkers(markers)
+      } catch (error) {
+        console.error('Failed to fetch spaces:', error)
+      } finally {
+        setLoading(false)
       }
+    }
+
+    fetchSpaces()
+  }, [searchParams])
 
   return (
     <>
-      {/* Leaflet CSS */}
       <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossOrigin=""
       />
-      <SpacesExplorer spaces={spaces} mapMarkers={mapMarkers} searchParams={searchParams} />
+      <SpacesExplorer 
+        spaces={spaces} 
+        mapMarkers={mapMarkers} 
+        searchParams={searchParams} 
+      />
+      {loading && (
+        <div className="fixed inset-0 bg-white/50 flex items-center justify-center z-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      )}
     </>
   )
 }

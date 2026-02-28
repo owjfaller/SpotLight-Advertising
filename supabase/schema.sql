@@ -2,6 +2,16 @@
 -- SpotLight Database Schema
 -- ============================================================
 
+-- Cleanup old mockup tables if they exist
+DROP TABLE IF EXISTS ad_space_buyers CASCADE;
+DROP TABLE IF EXISTS ad_spaces CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
+
+-- Cleanup types
+DROP TYPE IF EXISTS space_type CASCADE;
+DROP TYPE IF EXISTS ad_space_status CASCADE;
+
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

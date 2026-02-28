@@ -1,11 +1,13 @@
-export const dynamic = 'force-dynamic'
+'use client'
 
+import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getSpaceById } from '@/lib/queries/spaces'
+import { api } from '@/lib/services/api'
+import { AdSpace } from '@/lib/types/database.types'
 import { formatPrice } from '@/lib/utils/formatters'
-import { MOCK_SPACES, MOCK_EXTRAS } from '@/lib/mock/spaces'
 import ContactBlock from '@/components/spaces/ContactBlock'
+import InterestedButton from '@/components/spaces/InterestedButton'
 
 interface SpaceDetailPageProps {
   params: { id: string }
@@ -20,16 +22,36 @@ const typeColors: Record<string, string> = {
   Event:     'bg-pink-100',
 }
 
-export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) {
-  const hasSupabase = !!process.env.NEXT_PUBLIC_SUPABASE_URL
+export default function SpaceDetailPage({ params }: SpaceDetailPageProps) {
+  const [space, setSpace] = useState<AdSpace | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const space = hasSupabase
-    ? await getSpaceById(params.id)
-    : (MOCK_SPACES.find((s) => s.id === params.id) ?? null)
+  useEffect(() => {
+    async function fetchSpace() {
+      try {
+        const data = await api.getListingById(params.id)
+        setSpace(data)
+      } catch (error) {
+        console.error('Failed to fetch space:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSpace()
+  }, [params.id])
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
 
   if (!space) notFound()
 
-  const extras = MOCK_EXTRAS[space.id] ?? {
+  // Fallback for missing extras
+  const extras = {
     duration_min:          'Contact for details',
     availability:          'Contact owner',
     owner_name:            'Space Owner',
@@ -38,7 +60,7 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
     owner_listings:        1,
   }
 
-  const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/1200/600`
+  const imageUrl = space.image_url || `https://picsum.photos/seed/spotlight-${space.id}/1200/600`
   const color    = typeColors[space.space_type] ?? 'bg-gray-100'
 
   return (
@@ -139,7 +161,7 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
                   <dt className="text-xs text-gray-400">Status</dt>
                   <dd className="mt-0.5">
                     <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                      Published
+                      {space.status.charAt(0).toUpperCase() + space.status.slice(1)}
                     </span>
                   </dd>
                 </div>
@@ -158,6 +180,7 @@ export default async function SpaceDetailPage({ params }: SpaceDetailPageProps) 
                   <span className="text-sm font-normal text-gray-500">/mo</span>
                 </p>
               </div>
+              <InterestedButton spaceId={space.id} />
               <ContactBlock
                 listingTitle={space.title}
                 ownerName={extras.owner_name}

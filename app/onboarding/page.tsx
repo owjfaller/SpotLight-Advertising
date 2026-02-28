@@ -26,7 +26,7 @@ export default function OnboardingPage() {
 
     const { error } = await supabase
       .from('profiles')
-      .upsert({ id: user.id, display_name: displayName.trim() })
+      .upsert({ id: user.id, full_name: displayName.trim(), updated_at: new Date().toISOString() })
 
     if (error) {
       setError('Something went wrong. Please try again.')

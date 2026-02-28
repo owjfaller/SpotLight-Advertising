@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { api } from '@/lib/services/api'
+import { SpaceType } from '@/lib/types/database.types'
 
-const SPACE_TYPES = ['Billboard', 'Vehicle', 'Indoor', 'Outdoor', 'Digital', 'Event', 'Other']
+const SPACE_TYPES: SpaceType[] = ['Billboard', 'Vehicle', 'Indoor', 'Outdoor', 'Digital', 'Event', 'Other']
 
 export default function NewListingPage() {
   const router = useRouter()
@@ -17,7 +19,7 @@ export default function NewListingPage() {
 
   const [form, setForm] = useState({
     title:       '',
-    type:        '',
+    type:        '' as SpaceType | '',
     location:    '',
     city:        '',
     start_date:  '',
@@ -61,21 +63,18 @@ export default function NewListingPage() {
     setLoading(true)
     setError(null)
 
-    const res = await fetch('/api/listings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, image_url: imageUrl }),
-    })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      setError(data.error ?? 'Something went wrong.')
+    try {
+      const data = await api.createListing({
+        ...form,
+        type: form.type as SpaceType,
+        price: Number(form.price),
+        image_url: imageUrl || undefined,
+      })
+      router.push(`/spaces/${data.id}`)
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong.')
       setLoading(false)
-      return
     }
-
-    router.push(`/spaces/${data.id}`)
   }
 
   const inputStyle = {
