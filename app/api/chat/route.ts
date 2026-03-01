@@ -2,17 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { MOCK_SPACES } from '@/lib/mock/spaces'
 import { formatPrice } from '@/lib/utils/formatters'
+import { getFilteredAdSpaces } from '@/lib/queries/ad_spaces'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const LISTINGS_CONTEXT = MOCK_SPACES.map((s) => {
-  return `ID:${s.id} | TITLE:"${s.title}" | ${s.space_type} | ${s.city} | ${formatPrice(s.price_cents)}/mo`
-}).join('\n')
-
-const SYSTEM_PROMPT = `You are the SpotLight AI Advisor — a sharp advertising consultant helping brands find the perfect ad space.
+function buildSystemPrompt(listingsContext: string) {
+  return `You are the SpotLight AI Advisor — a sharp advertising consultant helping brands find the perfect ad space.
 
 Available listings (use exact TITLE values):
-${LISTINGS_CONTEXT}
+${listingsContext}
 
 YOUR JOB: Run a short 3-question discovery before recommending spaces. Follow this exact flow:
 
@@ -47,6 +45,7 @@ RULES FOR ALL PHASES:
 - No asterisks, no markdown, no bullet points
 - PICKS: only appears in Phase 4
 - Each pick title must exactly match a TITLE from the listings above`
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,10 +54,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid messages format' }, { status: 400 })
     }
 
+    // Fetch live listings, fall back to mock if empty
+    let spaces: { id: string; title: string; space_type: string; city: string | null; price_cents: number }[] = []
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      const result = await getFilteredAdSpaces({})
+      if (!result.error && result.data && result.data.length > 0) {
+        spaces = result.data as typeof spaces
+      }
+    }
+    if (spaces.length === 0) {
+      spaces = MOCK_SPACES
+    }
+
+    const listingsContext = spaces.map((s) =>
+      `ID:${s.id} | TITLE:"${s.title}" | ${s.space_type} | ${s.city} | ${formatPrice(s.price_cents)}/mo`
+    ).join('\n')
+
     const stream = client.messages.stream({
       model: 'claude-haiku-4-5',
       max_tokens: 400,
-      system: SYSTEM_PROMPT,
+      system: buildSystemPrompt(listingsContext),
       messages,
     })
 

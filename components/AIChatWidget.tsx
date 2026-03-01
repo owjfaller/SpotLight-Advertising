@@ -10,9 +10,18 @@ interface Message {
   content: string
 }
 
+interface LiveSpace {
+  id: string
+  title: string
+  space_type: string
+  city: string | null
+  price_cents: number
+  image_url?: string | null
+}
+
 const STARTER_PROMPTS = [
-  "I'm launching a food brand in Chicago",
-  'Best spaces under $500/mo in NYC',
+  "I'm launching a food brand in Provo",
+  'Best spaces under $500/mo in Salt Lake City',
   'Vehicle wraps vs billboards for B2C?',
 ]
 
@@ -26,16 +35,15 @@ const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
 }
 
 // ── Robust parser: scan the PICKS section for any known title substring ──────
-function parseResponse(raw: string): { text: string; pickedIds: string[] } {
+function parseResponse(raw: string, spaces: LiveSpace[]): { text: string; pickedIds: string[] } {
   const picksIdx = raw.search(/PICKS:/i)
   if (picksIdx === -1) return { text: raw.trim(), pickedIds: [] }
 
   const textPart = raw.slice(0, picksIdx).trim()
   const afterPicks = raw.slice(picksIdx + 6) // skip "PICKS:"
 
-  // Scan the entire afterPicks string for any known listing title
   const pickedIds: string[] = []
-  for (const space of MOCK_SPACES) {
+  for (const space of spaces) {
     if (afterPicks.toLowerCase().includes(space.title.toLowerCase())) {
       if (!pickedIds.includes(space.id)) pickedIds.push(space.id)
     }
@@ -45,13 +53,10 @@ function parseResponse(raw: string): { text: string; pickedIds: string[] } {
 }
 
 // ── Rich listing card ────────────────────────────────────────────────────────
-function ListingCard({ spaceId }: { spaceId: string }) {
-  const space = MOCK_SPACES.find((s) => s.id === spaceId)
-  const extra = MOCK_EXTRAS[spaceId]
-  if (!space) return null
-
+function ListingCard({ space }: { space: LiveSpace }) {
+  const extra = MOCK_EXTRAS[space.id]
   const color = TYPE_COLORS[space.space_type] ?? { bg: '#f3f4f6', text: '#374151' }
-  const imageUrl = `https://picsum.photos/seed/spotlight-${space.id}/160/120`
+  const imageUrl = space.image_url || `https://picsum.photos/seed/spotlight-${space.id}/160/120`
 
   return (
     <Link
@@ -127,8 +132,16 @@ export default function AIChatWidget() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
+  const [liveSpaces, setLiveSpaces] = useState<LiveSpace[]>(MOCK_SPACES)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    fetch('/api/listings')
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data) && data.length > 0) setLiveSpaces(data) })
+      .catch(() => {/* keep mock fallback */})
+  }, [])
 
   useEffect(() => {
     if (open && inputRef.current) inputRef.current.focus()
@@ -234,7 +247,7 @@ export default function AIChatWidget() {
                 }
 
                 const isCurrentlyStreaming = streaming && i === messages.length - 1
-                const { text, pickedIds } = parseResponse(msg.content)
+                const { text, pickedIds } = parseResponse(msg.content, liveSpaces)
 
                 return (
                   <div key={i} className="flex flex-col gap-2">
@@ -257,9 +270,10 @@ export default function AIChatWidget() {
                         <p className="px-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
                           Recommended spaces
                         </p>
-                        {pickedIds.map((id) => (
-                          <ListingCard key={id} spaceId={id} />
-                        ))}
+                        {pickedIds.map((id) => {
+                          const space = liveSpaces.find((s) => s.id === id)
+                          return space ? <ListingCard key={id} space={space} /> : null
+                        })}
                       </div>
                     )}
                   </div>
